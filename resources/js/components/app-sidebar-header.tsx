@@ -1,9 +1,21 @@
+import { useConnectionStatus } from "@laravel/echo-react"
+import { useRouterState } from "@tanstack/react-router"
 import { Breadcrumbs } from "@/components/breadcrumbs"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { useRouterState } from "@tanstack/react-router"
-import { useConversation } from "@/queries/chat"
 import { cn } from "@/lib/utils"
+import { useConversation } from "@/queries/chat"
 import type { BreadcrumbItem as BreadcrumbItemType } from "@/types"
+
+function connectionLabel(status: string): string {
+	switch (status) {
+		case "connected":
+			return "Online"
+		case "connecting":
+			return "Connecting…"
+		default:
+			return "Offline"
+	}
+}
 
 export function AppSidebarHeader({
 	breadcrumbs = [],
@@ -31,6 +43,7 @@ export function AppSidebarHeader({
 				? [{ title: "Chats", href: pathname }]
 				: null
 	const displayedBreadcrumbs = chatBreadcrumbs ?? breadcrumbs
+	const connectionStatus = useConnectionStatus()
 
 	return (
 		<header
@@ -47,6 +60,24 @@ export function AppSidebarHeader({
 					<Breadcrumbs breadcrumbs={displayedBreadcrumbs} />
 				</div>
 			</div>
+
+			<span
+				className={cn(
+					"inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+					connectionStatus === "connected"
+						? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400"
+						: "border-muted-foreground/20 bg-muted text-muted-foreground"
+				)}>
+				<span
+					className={cn(
+						"size-1.5 rounded-full",
+						connectionStatus === "connected"
+							? "bg-green-500"
+							: "bg-muted-foreground/50"
+					)}
+				/>
+				{connectionLabel(connectionStatus)}
+			</span>
 		</header>
 	)
 }

@@ -17,7 +17,6 @@ export function useConversations() {
 			Axios.get<{ data: ChatConversation[] }>("api/chat/conversations").then(
 				(res) => res.data.data
 			),
-		refetchInterval: 30_000,
 	})
 }
 
