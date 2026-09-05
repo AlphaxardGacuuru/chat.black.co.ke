@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useConversationChannel } from "@/hooks/use-conversation-channel"
 import { cn } from "@/lib/utils"
 import type { ChatConversation } from "@/types/chat"
 
@@ -15,7 +16,10 @@ function formatTime(value: string | null): string {
 	const now = new Date()
 
 	if (date.toDateString() === now.toDateString()) {
-		return date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })
+		return date.toLocaleTimeString(undefined, {
+			hour: "numeric",
+			minute: "2-digit",
+		})
 	}
 
 	return date.toLocaleDateString(undefined, { month: "short", day: "numeric" })
@@ -27,8 +31,15 @@ type Props = {
 	onSelect: () => void
 }
 
-export default function ConversationListRow({ conversation, isSelected, onSelect }: Props) {
+export default function ConversationListRow({
+	conversation,
+	isSelected,
+	onSelect,
+}: Props) {
 	const { otherUser, lastMessage, unreadCount, lastMessageAt } = conversation
+
+	const { onlineUserIds } = useConversationChannel(conversation.id)
+	const isOnline = otherUser ? onlineUserIds.has(otherUser.id) : false
 
 	return (
 		<button
@@ -36,7 +47,7 @@ export default function ConversationListRow({ conversation, isSelected, onSelect
 			onClick={onSelect}
 			className={cn(
 				"flex w-full items-center gap-2 rounded-lg border bg-card px-2 py-2 text-left shadow-sm transition-all hover:-translate-y-px hover:shadow-md md:gap-3 md:rounded-xl md:px-3 md:py-3",
-				isSelected && "border-primary/50 bg-muted"
+				isSelected && "border-primary/50"
 			)}>
 			<Avatar className="size-14 shrink-0">
 				<AvatarImage
@@ -44,11 +55,18 @@ export default function ConversationListRow({ conversation, isSelected, onSelect
 					alt={otherUser?.name}
 				/>
 				<AvatarFallback>{initials(otherUser?.name)}</AvatarFallback>
+				{isOnline && (
+					<span className="absolute right-0.5 bottom-0.5 size-3 rounded-full bg-green-500 ring-2 ring-card" />
+				)}
 			</Avatar>
 
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center justify-between gap-2">
-					<span className={cn("truncate", unreadCount > 0 && "font-semibold text-primary")}>
+					<span
+						className={cn(
+							"truncate",
+							unreadCount > 0 && "font-semibold text-primary"
+						)}>
 						{otherUser?.name ?? "Unknown"}
 					</span>
 					<span className="shrink-0 text-xs text-muted-foreground">
@@ -64,7 +82,9 @@ export default function ConversationListRow({ conversation, isSelected, onSelect
 					<span
 						className={cn(
 							"truncate text-sm",
-							unreadCount > 0 ? "font-medium text-primary" : "text-muted-foreground"
+							unreadCount > 0
+								? "font-medium text-primary"
+								: "text-muted-foreground"
 						)}>
 						{lastMessage?.body || "No messages yet"}
 					</span>

@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react"
-import { useEcho, usePresenceChannel } from "@laravel/echo-react"
-import { useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft } from "lucide-react"
 import MessageBubble from "@/components/chat/MessageBubble"
 import MessageComposer from "@/components/chat/MessageComposer"
@@ -9,8 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useApp } from "@/contexts/AppContext"
+import { useConversationChannel } from "@/hooks/use-conversation-channel"
 import { useConversation, useMarkConversationRead } from "@/queries/chat"
-import type { ChatMessage } from "@/types/chat"
 
 const TYPING_WHISPER_THROTTLE_MS = 2000
 const TYPING_IDLE_TIMEOUT_MS = 3000
@@ -37,54 +35,34 @@ function formatLastSeen(value: string): string {
 	return `${Math.floor(hours / 24)}d ago`
 }
 
-type PresenceMember = { id: string; name: string; avatar: string | null }
-
 type Props = {
 	conversationId: string
 	variant: "pane" | "page"
 	onBack?: () => void
 }
 
-export default function ConversationView({ conversationId, variant, onBack }: Props) {
+export default function ConversationView({
+	conversationId,
+	variant,
+	onBack,
+}: Props) {
 	const { auth } = useApp()
-	const queryClient = useQueryClient()
 	const { data, isLoading } = useConversation(conversationId)
 	const markRead = useMarkConversationRead()
 
 	const [isOtherTyping, setIsOtherTyping] = useState(false)
-	const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set())
 	const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 	const lastWhisperAtRef = useRef(0)
 
-	const channelName = `chat-conversation.${conversationId}`
 	const myId = auth ? String(auth.id) : null
 
-	const { channel } = usePresenceChannel(channelName)
-
-	useEcho(
-		channelName,
-		"ChatMessageSent",
-		(event: { message: ChatMessage }) => {
-			queryClient.invalidateQueries({ queryKey: ["chat", "conversations"] })
-			queryClient.invalidateQueries({ queryKey: ["chat", "conversation", conversationId] })
-
-			if (event.message.senderId !== myId) {
+	const { onlineUserIds, channel } = useConversationChannel(conversationId, {
+		onMessage: (message) => {
+			if (message.senderId !== myId) {
 				markRead.mutate(conversationId)
 			}
 		},
-		[conversationId],
-		"presence"
-	)
-
-	useEcho(
-		channelName,
-		"ChatConversationRead",
-		() => {
-			queryClient.invalidateQueries({ queryKey: ["chat", "conversation", conversationId] })
-		},
-		[conversationId],
-		"presence"
-	)
+	})
 
 	useEffect(() => {
 		markRead.mutate(conversationId)
@@ -97,21 +75,9 @@ export default function ConversationView({ conversationId, variant, onBack }: Pr
 			return
 		}
 
-		presenceChannel
-			.here((members: PresenceMember[]) => {
-				setOnlineUserIds(new Set(members.map((member) => member.id)))
-			})
-			.joining((member: PresenceMember) => {
-				setOnlineUserIds((previous) => new Set(previous).add(member.id))
-			})
-			.leaving((member: PresenceMember) => {
-				setOnlineUserIds((previous) => {
-					const next = new Set(previous)
-					next.delete(member.id)
-					return next
-				})
-			})
-			.listenForWhisper("typing", (payload: { userId: string }) => {
+		presenceChannel.listenForWhisper(
+			"typing",
+			(payload: { userId: string }) => {
 				if (payload.userId === myId) {
 					return
 				}
@@ -125,7 +91,8 @@ export default function ConversationView({ conversationId, variant, onBack }: Pr
 					() => setIsOtherTyping(false),
 					TYPING_IDLE_TIMEOUT_MS
 				)
-			})
+			}
+		)
 
 		return () => {
 			if (typingTimeoutRef.current) {
@@ -175,6 +142,9 @@ export default function ConversationView({ conversationId, variant, onBack }: Pr
 						alt={otherUser?.name}
 					/>
 					<AvatarFallback>{initials(otherUser?.name)}</AvatarFallback>
+					{isOnline && (
+						<span className="absolute right-0 bottom-0 size-2.5 rounded-full bg-green-500 ring-2 ring-background" />
+					)}
 				</Avatar>
 
 				<div className="min-w-0 flex-1">
@@ -200,7 +170,9 @@ export default function ConversationView({ conversationId, variant, onBack }: Pr
 					/>
 				))}
 
-				{isOtherTyping && otherUser && <TypingIndicator name={otherUser.name} />}
+				{isOtherTyping && otherUser && (
+					<TypingIndicator name={otherUser.name} />
+				)}
 			</div>
 
 			<MessageComposer
