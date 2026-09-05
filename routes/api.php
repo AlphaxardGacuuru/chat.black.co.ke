@@ -4,9 +4,8 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\FilePondController;
 use App\Http\Controllers\IntegrationController;
 use App\Http\Controllers\Chat\ChatAttachmentController;
-use App\Http\Controllers\Chat\ChatLabelController;
+use App\Http\Controllers\Chat\ChatConversationController;
 use App\Http\Controllers\Chat\ChatMessageController;
-use App\Http\Controllers\Chat\ChatThreadController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\SettingController;
@@ -40,21 +39,17 @@ Route::middleware('auth:sanctum')->group(function () {
         "integrations" => IntegrationController::class,
         "support-tickets" => SupportTicketController::class,
         "settings" => SettingController::class,
-        "threads" => ChatThreadController::class,
-        "labels" => ChatLabelController::class,
     ]);
 
     Route::post('push-subscriptions', [PushSubscriptionController::class, 'store']);
     Route::delete('push-subscriptions', [PushSubscriptionController::class, 'destroy']);
 
-    Route::post('threads/{id}/labels', [ChatThreadController::class, 'attachLabel']);
-    Route::delete('threads/{id}/labels/{labelId}', [ChatThreadController::class, 'detachLabel']);
-
-    Route::post('messages', [ChatMessageController::class, 'store']);
-    Route::post('messages/{id}/reply', [ChatMessageController::class, 'reply']);
-    Route::post('messages/{id}/reply-all', [ChatMessageController::class, 'replyAll']);
-    Route::post('messages/{id}/forward', [ChatMessageController::class, 'forward']);
-    Route::post('messages/{id}/retry', [ChatMessageController::class, 'retry']);
+    Route::get('chat/conversations', [ChatConversationController::class, 'index']);
+    Route::post('chat/conversations', [ChatConversationController::class, 'store']);
+    Route::get('chat/conversations/{id}', [ChatConversationController::class, 'show']);
+    Route::post('chat/conversations/{id}/read', [ChatConversationController::class, 'markRead']);
+    Route::post('chat/conversations/{id}/messages', [ChatMessageController::class, 'store']);
+    Route::delete('chat/messages/{id}', [ChatMessageController::class, 'destroy']);
 
     Route::get('attachments/{id}/download', [ChatAttachmentController::class, 'download'])
         ->name('attachments.download');

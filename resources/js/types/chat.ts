@@ -1,6 +1,8 @@
-export type ChatAddress = {
-	address: string
-	name?: string | null
+export type ChatUser = {
+	id: string
+	name: string
+	avatar: string | null
+	lastSeenAt: string | null
 }
 
 export type ChatAttachment = {
@@ -8,70 +10,29 @@ export type ChatAttachment = {
 	filename: string | null
 	mimeType: string | null
 	size: number | null
-	isInline: boolean
 	downloadUrl: string
 }
 
-export type ChatLabel = {
-	id: string
-	name: string
-	color: string | null
-}
-
-export type ChatMessageStatus = "queued" | "sent" | "failed"
-
 export type ChatMessage = {
 	id: string
-	threadId: string
-	direction: "inbound" | "outbound"
-	folder: string
-	from: ChatAddress | null
-	to: ChatAddress[]
-	cc: ChatAddress[]
-	bcc: ChatAddress[]
-	subject: string | null
-	bodyHtml: string | null
-	bodyText: string | null
-	snippet: string | null
-	status: ChatMessageStatus | null
-	errorMessage: string | null
-	isRead: boolean
-	isStarred: boolean
-	hasAttachments: boolean
+	conversationId: string
+	senderId: string
+	body: string | null
 	attachments: ChatAttachment[]
-	labels: ChatLabel[]
-	sentAt: string | null
-	receivedAt: string | null
+	isRead: boolean
 	createdAt: string
 }
 
-export type ChatThreadSummary = {
+export type ChatConversationLastMessage = {
+	body: string | null
+	senderId: string
+	createdAt: string
+}
+
+export type ChatConversation = {
 	id: string
-	subject: string | null
-	snippet: string | null
-	from: ChatAddress | null
-	hasUnread: boolean
-	isStarred: boolean
-	messageCount: number
-	hasAttachments: boolean
+	otherUser: ChatUser | null
+	lastMessage: ChatConversationLastMessage | null
+	unreadCount: number
 	lastMessageAt: string | null
-	status: ChatMessageStatus | null
-	isRead: boolean
-}
-
-export type ChatThread = ChatThreadSummary & {
-	messages: ChatMessage[]
-}
-
-export type ChatFolderKey = "inbox" | "starred" | "sent" | "archive" | "trash"
-
-export type ChatComposeMode = "new" | "reply" | "reply-all" | "forward"
-
-export type ChatComposePayload = {
-	to?: string[]
-	cc?: string[]
-	bcc?: string[]
-	subject: string
-	bodyHtml: string
-	temporaryUploadIds?: number[]
 }

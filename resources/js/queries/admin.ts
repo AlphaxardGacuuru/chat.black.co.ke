@@ -3,21 +3,11 @@ import Axios from "@/lib/axios"
 
 export type AdminDashboardData = {
 	totals: {
-		chatsSent: number
-		chatsFailed: number
-		chatsQueued: number
+		totalConversations: number
+		totalMessages: number
 		totalUsers: number
 	}
-	statusBreakdown: { status: string; count: number }[]
-	dailyVolume: { date: string; sent: number; failed: number }[]
-	recentFailures: {
-		id: string
-		subject: string | null
-		to: string
-		status: string
-		errorMessage: string | null
-		createdAt: string
-	}[]
+	dailyVolume: { date: string; sent: number }[]
 }
 
 export function useAdminDashboard() {

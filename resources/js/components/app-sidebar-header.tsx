@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "@/components/breadcrumbs"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useRouterState } from "@tanstack/react-router"
-import { useLabels, useChatThread } from "@/queries/chat"
+import { useConversation } from "@/queries/chat"
 import { cn } from "@/lib/utils"
 import type { BreadcrumbItem as BreadcrumbItemType } from "@/types"
 
@@ -15,33 +15,16 @@ export function AppSidebarHeader({
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	})
-	const { data: labels } = useLabels()
-	const labelId = pathname.match(/^\/chat\/labels\/([^/]+)/)?.[1]
-	const threadId = pathname.match(/^\/chat\/([^/]+)\/show/)?.[1]
-	const { data: thread } = useChatThread(threadId ?? null)
-	const folder = pathname.match(/^\/chat\/([^/]+)/)?.[1]
-	const folderTitles: Record<string, string> = {
-		archive: "Archive",
-		sent: "Sent",
-		starred: "Starred",
-		trash: "Trash",
-		compose: "New message",
-	}
-	const chatTitle = threadId
-		? (thread?.subject || "(no subject)")
-		: labelId
-			? (labels?.find((label) => label.id === labelId)?.name ?? "Label")
-			: pathname === "/chat" || pathname === "/chat/"
-				? "Inbox"
-				: folder === "labels"
-					? "Chat"
-					: folder
-						? (folderTitles[folder] ?? folder.replace(/-/g, " "))
-						: null
+	const conversationId = pathname.match(/^\/chat\/([^/]+)\/show/)?.[1]
+	const { data } = useConversation(conversationId ?? null)
+	const chatTitle = conversationId
+		? (data?.conversation.otherUser?.name ?? "Chat")
+		: pathname === "/chat" || pathname === "/chat/"
+			? "Chats"
+			: null
 	const displayedBreadcrumbs = chatTitle
 		? [{ title: chatTitle, href: pathname }]
 		: breadcrumbs
-
 
 	return (
 		<header

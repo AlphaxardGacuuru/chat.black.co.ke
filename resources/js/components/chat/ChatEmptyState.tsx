@@ -1,22 +1,22 @@
-import { Inbox, MailSearch, MousePointerClick } from "lucide-react"
+import { MessageCircle, MessagesSquare, SearchX } from "lucide-react"
 
 type Props = {
-	variant: "no-threads" | "no-selection" | "search-no-results"
+	variant: "no-conversations" | "no-selection" | "search-no-results"
 }
 
-const CONTENT: Record<Props["variant"], { icon: typeof Inbox; title: string; description: string }> = {
-	"no-threads": {
-		icon: Inbox,
-		title: "Nothing here",
-		description: "This folder is empty.",
+const CONTENT: Record<Props["variant"], { icon: typeof MessageCircle; title: string; description: string }> = {
+	"no-conversations": {
+		icon: MessagesSquare,
+		title: "No conversations yet",
+		description: "Start a new chat to say hello.",
 	},
 	"no-selection": {
-		icon: MousePointerClick,
-		title: "Select a message",
-		description: "Choose a conversation from the list to read it.",
+		icon: MessageCircle,
+		title: "Select a conversation",
+		description: "Choose a chat from the list to start messaging.",
 	},
 	"search-no-results": {
-		icon: MailSearch,
+		icon: SearchX,
 		title: "No results",
 		description: "Try a different search term.",
 	},

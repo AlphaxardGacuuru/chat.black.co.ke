@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
-use App\Models\ChatAttachment;
+use App\Models\ChatMessageAttachment;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -13,9 +13,9 @@ class ChatAttachmentController extends Controller
     {
         $userId = auth('sanctum')->id();
 
-        $attachment = ChatAttachment::whereHas(
-            'message',
-            fn ($query) => $query->where('user_id', $userId)
+        $attachment = ChatMessageAttachment::whereHas(
+            'message.conversation.participants',
+            fn ($query) => $query->where('users.id', $userId)
         )->findOrFail($id);
 
         return Storage::disk($attachment->disk)->download(

@@ -1,4 +1,4 @@
-import { Send, Users, XCircle } from "lucide-react"
+import { MessageSquare, MessagesSquare, Users } from "lucide-react"
 import {
 	Bar,
 	BarChart,
@@ -19,8 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useAdminDashboard } from "@/queries/admin"
 
 const chartConfig: ChartConfig = {
-	sent: { label: "Sent", color: "hsl(var(--chart-1))" },
-	failed: { label: "Failed", color: "hsl(var(--chart-2))" },
+	sent: { label: "Messages sent", color: "hsl(var(--chart-1))" },
 }
 
 export default function AdminDashboard() {
@@ -34,7 +33,7 @@ export default function AdminDashboard() {
 				<Heading
 					variant="small"
 					title="Overview"
-					description="Chat send activity across the app"
+					description="Chat activity across the app"
 				/>
 
 				{isLoading || !data ? (
@@ -50,16 +49,15 @@ export default function AdminDashboard() {
 					<>
 						<div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
 							<AdminStatCard
-								label="Chats sent"
-								value={data.totals.chatsSent}
-								icon={Send}
-								tone="success"
+								label="Conversations"
+								value={data.totals.totalConversations}
+								icon={MessagesSquare}
 							/>
 							<AdminStatCard
-								label="Chats failed"
-								value={data.totals.chatsFailed}
-								icon={XCircle}
-								tone="danger"
+								label="Messages sent"
+								value={data.totals.totalMessages}
+								icon={MessageSquare}
+								tone="success"
 							/>
 							<AdminStatCard
 								label="Total users"
@@ -103,51 +101,8 @@ export default function AdminDashboard() {
 										fill="var(--color-sent)"
 										radius={4}
 									/>
-									<Bar
-										dataKey="failed"
-										fill="var(--color-failed)"
-										radius={4}
-									/>
 								</BarChart>
 							</ChartContainer>
-						</div>
-
-						<div className="rounded-lg border p-4">
-							<Heading
-								variant="small"
-								title="Recent failures"
-							/>
-
-							{data.recentFailures.length === 0 ? (
-								<p className="py-6 text-center text-sm text-muted-foreground">
-									No recent failures.
-								</p>
-							) : (
-								<div className="divide-y">
-									{data.recentFailures.map((failure) => (
-										<div
-											key={failure.id}
-											className="flex flex-col gap-1 py-3 text-sm">
-											<div className="flex items-center justify-between gap-2">
-												<span className="truncate font-medium">
-													{failure.subject || "(no subject)"}
-												</span>
-												<span className="shrink-0 text-xs text-muted-foreground">
-													{new Date(failure.createdAt).toLocaleString()}
-												</span>
-											</div>
-											<p className="truncate text-muted-foreground">
-												To: {failure.to || "—"}
-											</p>
-											{failure.errorMessage && (
-												<p className="truncate text-red-600 dark:text-red-400">
-													{failure.errorMessage}
-												</p>
-											)}
-										</div>
-									))}
-								</div>
-							)}
 						</div>
 					</>
 				)}

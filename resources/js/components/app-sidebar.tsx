@@ -3,17 +3,19 @@ import { Download, MessageSquare } from "lucide-react"
 import { AdminNav } from "@/components/admin/AdminNav"
 import AppLogo from "@/components/app-logo"
 import AutoPushPrompt from "@/components/auto-push-prompt"
-import { ChatNav } from "@/components/chat-nav"
 import { NavFooter } from "@/components/nav-footer"
 import { NavNotifications } from "@/components/nav-notifications"
 import { NavUser } from "@/components/nav-user"
 import { useApp } from "@/contexts/AppContext"
+import { useCurrentUrl } from "@/hooks/use-current-url"
 import { usePwaInstall } from "@/hooks/use-pwa-install"
 import { ADMIN_EMAIL } from "@/middleware/auth"
+import { toUrl } from "@/lib/utils"
 import {
 	Sidebar,
 	SidebarContent,
 	SidebarFooter,
+	SidebarGroup,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
@@ -43,6 +45,7 @@ export function AppSidebar() {
 	const { state } = useSidebar()
 	const { isInstalled } = usePwaInstall()
 	const { auth } = useApp()
+	const { isCurrentUrl } = useCurrentUrl()
 	const isAdmin = auth?.email === ADMIN_EMAIL
 
 	return (
@@ -73,7 +76,23 @@ export function AppSidebar() {
 			</SidebarHeader>
 
 			<SidebarContent>
-				<ChatNav />
+				<SidebarGroup className="px-2 py-0">
+					<SidebarMenu>
+						{mainNavItems.map((item) => (
+							<SidebarMenuItem key={item.title}>
+								<SidebarMenuButton
+									asChild
+									isActive={isCurrentUrl(item.href)}
+									tooltip={item.title}>
+									<Link href={toUrl(item.href)}>
+										{item.icon && <item.icon />}
+										<span>{item.title}</span>
+									</Link>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						))}
+					</SidebarMenu>
+				</SidebarGroup>
 				{isAdmin && <AdminNav />}
 			</SidebarContent>
 

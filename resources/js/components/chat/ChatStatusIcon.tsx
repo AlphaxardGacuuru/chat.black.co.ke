@@ -1,80 +1,36 @@
-import { Check, Clock } from "lucide-react"
+import { Check } from "lucide-react"
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip"
-import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
-import type { ChatMessageStatus } from "@/types/chat"
 
 type Props = {
-	status: ChatMessageStatus | null
+	isRead: boolean
 	className?: string
 }
 
-function Ticks({ count, className }: { count: number; className?: string }) {
-	return (
-		<span className="flex items-center gap-0.5">
-			{Array.from({ length: count }).map((_, index) => (
-				<Check
-					key={index}
-					className={cn(index > 0 && "-ml-2", className)}
-				/>
-			))}
-		</span>
-	)
-}
-
 /**
- * Statuses track a simple outbound send lifecycle: queued -> sent, with
- * failed as the terminal error state.
+ * A single gray tick means the message has been sent; a second, blue tick
+ * appears once the recipient's last_read_at has caught up to this message.
  */
-export default function ChatStatusIcon({ status, className }: Props) {
-	if (!status) {
-		return null
-	}
-
+export default function ChatStatusIcon({ isRead, className }: Props) {
 	const size = cn("size-3.5", className)
-	let label: string
-	let icon: ReactNode
-
-	switch (status) {
-		case "queued":
-			label = "Queued"
-			icon = <Clock className={cn(size, "text-muted-foreground")} />
-			break
-
-		case "sent":
-			label = "Sent"
-			icon = (
-				<Ticks
-					count={1}
-					className={cn(size, "text-muted-foreground")}
-				/>
-			)
-			break
-
-		case "failed":
-			label = "Failed"
-			icon = (
-				<Ticks
-					count={1}
-					className={cn(size, "text-destructive")}
-				/>
-			)
-			break
-
-		default:
-			return null
-	}
 
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<span aria-label={label}>{icon}</span>
+				<span
+					aria-label={isRead ? "Read" : "Sent"}
+					className="flex items-center gap-0.5">
+					<Check className={cn(size, isRead ? "text-primary" : "text-muted-foreground")} />
+					{isRead && (
+						<Check className={cn(size, "-ml-2 text-primary")} />
+					)}
+				</span>
 			</TooltipTrigger>
-			<TooltipContent>{label}</TooltipContent>
+			<TooltipContent>{isRead ? "Read" : "Sent"}</TooltipContent>
 		</Tooltip>
 	)
 }

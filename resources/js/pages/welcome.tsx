@@ -4,111 +4,96 @@ import AppLogo from "@/components/app-logo"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GlassCard, GlassInner } from "@/components/ui/glass-card"
 import ChatStatusIcon from "@/components/chat/ChatStatusIcon"
-import type { ChatMessageStatus } from "@/types/chat"
 import { Link } from "@/components/ui/link"
 import {
 	ArrowRight,
 	CheckCircle2,
-	Clock,
 	Globe,
-	Inbox,
-	Mail,
+	Image as ImageIcon,
+	MessageCircle,
+	MessagesSquare,
+	Mic,
+	Paperclip,
+	Reply,
 	Send,
 	ShieldCheck,
+	Smile,
 	Sparkles,
+	Zap,
 } from "lucide-react"
 
 type WelcomeProps = {
 	canRegister?: boolean
 }
 
-function ComingSoonBadge() {
-	return (
-		<span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">
-			Coming soon
-		</span>
-	)
-}
-
 type StatusLegendEntry = {
-	status: ChatMessageStatus
-	isRead?: boolean
+	isRead: boolean
 	label: string
 	description: string
-	comingSoon?: boolean
 }
 
 const heroStatusLegend: StatusLegendEntry[] = [
-	{ status: "queued", label: "Queued", description: "waiting to send" },
-	{ status: "sent", label: "Sent", description: "left your outbox" },
-	{ status: "failed", label: "Failed", description: "the send failed" },
+	{ isRead: false, label: "Sent", description: "left your device" },
+	{ isRead: true, label: "Read", description: "they've seen it" },
 ]
 
 const fullStatusLegend: StatusLegendEntry[] = [
-	{ status: "queued", label: "Queued", description: "Waiting to send." },
-	{ status: "sent", label: "Sent", description: "Left your outbox." },
-	{
-		status: "failed",
-		label: "Failed",
-		description: "The send attempt failed.",
-	},
+	{ isRead: false, label: "Sent", description: "Delivered the instant you hit send." },
+	{ isRead: true, label: "Read", description: "Turns blue the moment they open it." },
 ]
 
 const featureHighlights = [
 	{
-		icon: Inbox,
-		title: "Every stage, visible",
+		icon: Zap,
+		title: "Real-time, always",
 		description:
-			"A clock for queued, one tick the moment it's sent, so you always know where a message stands.",
+			"Messages arrive over a live connection the instant they're sent — no refresh, no delay.",
 	},
 	{
 		icon: ShieldCheck,
-		title: "Failures flagged in red",
+		title: "Know when they've read it",
 		description:
-			"Failed sends show up as a red tick immediately, and you can retry them with one click.",
+			"A single gray tick means sent, a blue double tick means read — no guessing.",
 	},
 	{
-		icon: Send,
-		title: "Threaded conversations",
+		icon: MessageCircle,
+		title: "See who's around",
 		description:
-			"Replies stay grouped into clean threads, so context never gets lost across a long back-and-forth.",
+			"Typing indicators and last-seen status keep you in sync with the other person.",
 	},
 	{
 		icon: Globe,
-		title: "One inbox, organized",
+		title: "Start any conversation",
 		description:
-			"Star, archive, label, and trash your way to a clean inbox — no juggling apps or tabs.",
+			"Search for anyone on your team and start chatting in one tap — no setup required.",
 	},
 ]
 
 const workflowBenefits = [
-	{ text: "Status tracking for every message you send, queued through sent." },
-	{ text: "One-click retry for anything that fails to send." },
-	{ text: "A threaded inbox with starred, sent, and archive views." },
-	{ text: "Custom labels to keep every conversation organized." },
+	{ text: "Real-time delivery over a live websocket connection." },
+	{ text: "Read receipts, so you always know when a message landed." },
+	{ text: "Typing indicators and last-seen presence." },
+	{ text: "Share photos and files right inside the conversation." },
 ]
 
 const mockInbox = [
 	{
 		from: "Acme Corp",
-		subject: "Q3 proposal, final review",
+		subject: "Can you review the Q3 proposal?",
 		time: "9:41 AM",
-		status: "sent" as ChatMessageStatus,
-		isRead: false,
+		isRead: true,
 	},
 	{
 		from: "Jordan Lee",
 		subject: "Following up on yesterday's call",
 		time: "8:15 AM",
-		status: "queued" as ChatMessageStatus,
-		isRead: true,
+		isRead: false,
 	},
 	{
-		from: "Billing",
-		subject: "Invoice #482 delivery failed",
+		from: "Sam Rivera",
+		subject: "Sent the files over 📎",
 		time: "Yesterday",
-		status: "failed" as ChatMessageStatus,
-		isRead: false,
+		isRead: true,
 	},
 ]
 
@@ -195,12 +180,32 @@ const Welcome: FC<WelcomeProps> = () => {
 				<div className="absolute -left-40 -top-28 h-80 w-80 rounded-full bg-primary/36 blur-3xl dark:bg-primary/28" />
 				<div className="absolute -right-24 top-36 h-96 w-96 rounded-full bg-secondary/70 blur-3xl dark:bg-secondary/35" />
 				<div className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-foreground/18 blur-3xl dark:bg-foreground/12" />
-				<div className="bg-motion-drift bg-motion-delay-1 absolute left-[43%] top-[7%] h-44 w-44 -translate-x-1/2 rounded-[2.5rem] bg-white/58 dark:bg-white/22" />
-				<div className="bg-motion-rotate bg-motion-delay-2 absolute right-[3%] top-[15%] h-36 w-36 rotate-12 rounded-3xl bg-secondary/85 dark:bg-secondary/40" />
-				<div className="bg-motion-float bg-motion-delay-3 absolute bottom-[38%] left-[36%] h-48 w-48 -rotate-12 rounded-full bg-primary/46 dark:bg-primary/34" />
-				<div className="bg-motion-drift absolute bottom-[12%] right-[20%] h-56 w-56 rounded-[3rem] bg-secondary/60 dark:bg-secondary/25" />
+				<div className="bg-motion-drift bg-motion-delay-1 absolute left-[43%] top-[7%] flex h-24 w-24 -translate-x-1/2 items-center justify-center rounded-[2.5rem] border border-white/60 bg-white/58 text-primary shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-white/10">
+					<MessageCircle
+						className="size-10"
+						strokeWidth={1.5}
+					/>
+				</div>
+				<div className="bg-motion-rotate bg-motion-delay-2 absolute right-[3%] top-[15%] flex h-20 w-20 rotate-12 items-center justify-center rounded-3xl border border-white/60 bg-secondary/85 text-secondary-foreground shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-secondary/40">
+					<Send
+						className="size-8 -rotate-12"
+						strokeWidth={1.5}
+					/>
+				</div>
+				<div className="bg-motion-float bg-motion-delay-3 absolute bottom-[38%] left-[36%] flex h-28 w-28 -rotate-12 items-center justify-center rounded-full border border-white/60 bg-primary/46 text-primary-foreground shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-primary/34">
+					<MessagesSquare
+						className="size-11 rotate-12"
+						strokeWidth={1.5}
+					/>
+				</div>
+				<div className="bg-motion-drift absolute bottom-[12%] right-[20%] flex h-32 w-32 items-center justify-center rounded-[3rem] border border-white/60 bg-secondary/60 text-secondary-foreground shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-secondary/25">
+					<Paperclip
+						className="size-12"
+						strokeWidth={1.5}
+					/>
+				</div>
 				{/* Brand Background Gradient Start */}
-				<div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(143,255,224,0.18),transparent_35%),radial-gradient(circle_at_88%_14%,rgba(0,49,58,0.55),transparent_40%),linear-gradient(to_bottom,transparent,rgba(143,255,224,0.08),transparent)] dark:bg-[radial-gradient(circle_at_12%_10%,rgba(143,255,224,0.22),transparent_35%),radial-gradient(circle_at_88%_14%,rgba(0,49,58,0.22),transparent_40%),linear-gradient(to_bottom,transparent,rgba(143,255,224,0.12),transparent)]" />
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(255,0,102,0.18),transparent_35%),radial-gradient(circle_at_88%_14%,rgba(255,239,184,0.55),transparent_40%),linear-gradient(to_bottom,transparent,rgba(255,0,102,0.08),transparent)] dark:bg-[radial-gradient(circle_at_12%_10%,rgba(255,0,102,0.22),transparent_35%),radial-gradient(circle_at_88%_14%,rgba(255,239,184,0.22),transparent_40%),linear-gradient(to_bottom,transparent,rgba(255,0,102,0.12),transparent)]" />
 				{/* Brand Background Gradient End */}
 				<div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.75)_1px,transparent_1px)] bg-size-[16px_16px] opacity-[0.12] dark:opacity-[0.05]" />
 				<div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.32)_0%,transparent_30%,rgba(148,163,184,0.2)_50%,transparent_70%,rgba(255,255,255,0.22)_100%)] opacity-[0.26] dark:opacity-[0.12]" />
@@ -222,29 +227,29 @@ const Welcome: FC<WelcomeProps> = () => {
 
 			{/* START: Hero Section */}
 			<section
-				data-cursor-label="Inbox overview"
+				data-cursor-label="Chat overview"
 				className="relative z-10 mx-auto max-w-7xl px-4 pb-18 pt-10 sm:px-6 lg:px-8 lg:pb-24 lg:pt-16">
 				<div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
 					<div className="space-y-8">
 						<div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-4 py-2 text-sm text-primary shadow-sm backdrop-blur-sm">
 							<Sparkles className="size-4" />
-							<span>Email that tells you what happened</span>
+							<span>Chat that tells you what happened</span>
 						</div>
 
 						<div className="space-y-5">
 							<h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
 								<span className="bg-linear-to-r from-primary via-foreground to-primary bg-clip-text text-transparent dark:via-white">
-									Send email. Know it landed.
+									Message instantly. Know when they've read it.
 								</span>
 							</h1>
 							<p className="max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-								An email client built around one status icon that tells you
-								exactly where every message stands, from your outbox to their
-								inbox.
+								Real-time chat built around one status icon that tells you
+								exactly where every message stands, from your device to
+								theirs.
 							</p>
 							<p className="max-w-xl text-base leading-7 text-muted-foreground/90">
-								Every message is tracked from queued to sent, so you always
-								know exactly where it stands.
+								Every message arrives instantly and turns blue the moment
+								they've opened it — no refreshing, no guessing.
 							</p>
 						</div>
 
@@ -266,18 +271,17 @@ const Welcome: FC<WelcomeProps> = () => {
 							</Link>
 						</div>
 
-						<div className="grid gap-3 sm:grid-cols-3">
+						<div className="grid gap-3 sm:grid-cols-2">
 							{heroStatusLegend.map((entry) => (
 								<GlassCard
 									key={entry.label}
 									className={`p-4 ${magnifyHoverClass}`}>
 									<div className="flex items-center gap-2">
 										<ChatStatusIcon
-											status={entry.status}
+											isRead={entry.isRead}
 											className="size-4"
 										/>
 										<p className="text-sm font-semibold">{entry.label}</p>
-										{entry.comingSoon && <ComingSoonBadge />}
 									</div>
 									<p className="mt-2 text-sm text-muted-foreground">
 										{entry.description}
@@ -289,13 +293,33 @@ const Welcome: FC<WelcomeProps> = () => {
 
 					<div
 						className="relative"
-						data-cursor-label="Live inbox preview">
+						data-cursor-label="Live chat preview">
 						{/* START: First Card Local Backdrop Elements */}
 						<div className="pointer-events-none absolute -inset-x-8 -inset-y-10 z-0 overflow-visible">
-							<div className="bg-motion-float bg-motion-delay-1 absolute left-[2%] top-[8%] h-32 w-32 rounded-[1.6rem] bg-white/62 dark:bg-white/24" />
-							<div className="bg-motion-rotate bg-motion-delay-2 absolute -right-[2%] top-[14%] h-28 w-28 rotate-12 rounded-2xl bg-sky-200/66 dark:bg-sky-400/32" />
-							<div className="bg-motion-drift bg-motion-delay-3 absolute bottom-[14%] left-[14%] h-36 w-36 -rotate-12 rounded-full bg-primary/48 dark:bg-primary/36" />
-							<div className="bg-motion-float absolute -bottom-[2%] right-[4%] h-40 w-40 rounded-[2.1rem] bg-slate-200/58 dark:bg-slate-300/26" />
+							<div className="bg-motion-float bg-motion-delay-1 absolute left-[2%] top-[8%] flex h-20 w-20 items-center justify-center rounded-[1.4rem] border border-white/60 bg-white/62 text-foreground/70 shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-white/24">
+								<Smile
+									className="size-8"
+									strokeWidth={1.5}
+								/>
+							</div>
+							<div className="bg-motion-rotate bg-motion-delay-2 absolute -right-[2%] top-[14%] flex h-16 w-16 rotate-12 items-center justify-center rounded-2xl border border-white/60 bg-sky-200/66 text-sky-700 shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-sky-400/32 dark:text-sky-200">
+								<Mic
+									className="size-7 -rotate-12"
+									strokeWidth={1.5}
+								/>
+							</div>
+							<div className="bg-motion-drift bg-motion-delay-3 absolute bottom-[14%] left-[14%] flex h-24 w-24 -rotate-12 items-center justify-center rounded-full border border-white/60 bg-primary/48 text-primary-foreground shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-primary/36">
+								<ImageIcon
+									className="size-9 rotate-12"
+									strokeWidth={1.5}
+								/>
+							</div>
+							<div className="bg-motion-float absolute -bottom-[2%] right-[4%] flex h-24 w-24 items-center justify-center rounded-4xl border border-white/60 bg-slate-200/58 text-slate-700 shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-slate-300/26 dark:text-slate-800">
+								<Reply
+									className="size-9"
+									strokeWidth={1.5}
+								/>
+							</div>
 						</div>
 						{/* END: First Card Local Backdrop Elements */}
 
@@ -305,12 +329,12 @@ const Welcome: FC<WelcomeProps> = () => {
 								<div className="flex items-center justify-between gap-3">
 									<div>
 										<p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
-											Live inbox
+											Live chats
 										</p>
-										<CardTitle className="mt-2 text-2xl">Inbox</CardTitle>
+										<CardTitle className="mt-2 text-2xl">Chats</CardTitle>
 									</div>
 									<div className="rounded-2xl border border-primary/20 bg-primary/10 p-3 text-primary">
-										<Mail className="size-6" />
+										<MessagesSquare className="size-6" />
 									</div>
 								</div>
 							</CardHeader>
@@ -333,7 +357,7 @@ const Welcome: FC<WelcomeProps> = () => {
 											</div>
 											<div className="flex items-center gap-1.5">
 												<ChatStatusIcon
-													status={message.status}
+													isRead={message.isRead}
 													className="size-3.5 shrink-0"
 												/>
 												<p className="truncate text-sm text-muted-foreground">
@@ -372,7 +396,7 @@ const Welcome: FC<WelcomeProps> = () => {
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					<div className="mx-auto max-w-3xl text-center">
 						<p className="text-sm font-medium uppercase tracking-[0.28em] text-primary">
-							Everything Email. One Inbox
+							Everything Chat. One Conversation
 						</p>
 						<h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
 							Designed around one question: did they see it?
@@ -386,14 +410,14 @@ const Welcome: FC<WelcomeProps> = () => {
 					<div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
 						<GlassCard className="group p-6 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:scale-[1.08] hover:shadow-lg">
 							<div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-								<Mail className="size-5" />
+								<Paperclip className="size-5" />
 							</div>
 							<h3 className="mt-5 text-lg font-semibold">
-								Find anything fast
+								Share on the go
 							</h3>
 							<p className="mt-3 text-sm leading-6 text-muted-foreground">
-								Full-text search across every thread means nothing you've sent
-								ever really gets lost.
+								Drop in photos and files right inside the conversation, no
+								separate upload flow.
 							</p>
 						</GlassCard>
 						{featureHighlights.map(({ icon: Icon, title, description }) => (
@@ -416,7 +440,7 @@ const Welcome: FC<WelcomeProps> = () => {
 
 			{/* START: Platform Walkthrough Section */}
 			<section
-				data-cursor-label="Delivery status walkthrough"
+				data-cursor-label="Message status walkthrough"
 				id="platform"
 				className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
 				<div className="mb-10 max-w-3xl">
@@ -437,7 +461,7 @@ const Welcome: FC<WelcomeProps> = () => {
 						<div className="flex items-center gap-3">
 							<div className="rounded-2xl bg-primary/10 p-3 text-primary">
 								<ChatStatusIcon
-									status="sent"
+									isRead={true}
 									className="size-5"
 								/>
 							</div>
@@ -445,23 +469,22 @@ const Welcome: FC<WelcomeProps> = () => {
 								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
 									Status legend
 								</p>
-								<CardTitle className="mt-1">From queued to sent</CardTitle>
+								<CardTitle className="mt-1">From sent to read</CardTitle>
 							</div>
 						</div>
 					</CardHeader>
 					<CardContent>
-						<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+						<div className="grid gap-4 sm:grid-cols-2">
 							{fullStatusLegend.map((entry) => (
 								<GlassInner
-									key={`${entry.status}-${entry.isRead ?? ""}`}
+									key={entry.label}
 									className="p-4">
 									<div className="flex items-center gap-2">
 										<ChatStatusIcon
-											status={entry.status}
+											isRead={entry.isRead}
 											className="size-4"
 										/>
 										<p className="text-sm font-semibold">{entry.label}</p>
-										{entry.comingSoon && <ComingSoonBadge />}
 									</div>
 									<p className="mt-2 text-sm leading-6 text-muted-foreground">
 										{entry.description}
@@ -477,21 +500,20 @@ const Welcome: FC<WelcomeProps> = () => {
 						<CardHeader className="pb-4">
 							<div className="flex items-center gap-3">
 								<div className="rounded-2xl bg-primary/10 p-3 text-primary">
-									<Inbox className="size-5" />
+									<Zap className="size-5" />
 								</div>
 								<div>
 									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-										Organize
+										Realtime
 									</p>
-									<CardTitle className="mt-1">Threaded inbox</CardTitle>
+									<CardTitle className="mt-1">Instant delivery</CardTitle>
 								</div>
 							</div>
 						</CardHeader>
 						<CardContent>
 							<p className="text-sm leading-6 text-muted-foreground">
-								Replies collapse into a single thread with starred, sent, and
-								archive views, so a conversation never gets lost across a dozen
-								replies.
+								Messages travel over a live connection the moment you hit
+								send — the other person sees it appear without refreshing.
 							</p>
 						</CardContent>
 					</Card>
@@ -504,16 +526,16 @@ const Welcome: FC<WelcomeProps> = () => {
 								</div>
 								<div>
 									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-										Reliability
+										Clarity
 									</p>
-									<CardTitle className="mt-1">Failures, handled</CardTitle>
+									<CardTitle className="mt-1">Read receipts</CardTitle>
 								</div>
 							</div>
 						</CardHeader>
 						<CardContent>
 							<p className="text-sm leading-6 text-muted-foreground">
-								Failed sends are flagged the moment they happen, and you can
-								retry them with a single click.
+								The tick turns blue the instant they open the conversation —
+								no more wondering if they've seen it.
 							</p>
 						</CardContent>
 					</Card>
@@ -526,16 +548,16 @@ const Welcome: FC<WelcomeProps> = () => {
 								</div>
 								<div>
 									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-										Organize
+										Presence
 									</p>
-									<CardTitle className="mt-1">Labels &amp; search</CardTitle>
+									<CardTitle className="mt-1">Online &amp; typing</CardTitle>
 								</div>
 							</div>
 						</CardHeader>
 						<CardContent>
 							<p className="text-sm leading-6 text-muted-foreground">
-								Tag conversations with custom labels and find anything again
-								with full-text search across your inbox.
+								See when someone's typing, and check their last-seen status
+								when they're not around.
 							</p>
 						</CardContent>
 					</Card>
@@ -555,31 +577,21 @@ const Welcome: FC<WelcomeProps> = () => {
 								Everything in one inbox
 							</p>
 							<h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-								Send with confidence, and know exactly what happened next.
+								Chat instantly, and know exactly what happened next.
 							</h2>
 							<p className="mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">
-								Whether you're sending a handful of emails a day or running a
-								team inbox, Black Chat gives you the status clarity to stop
-								guessing and start knowing.
+								Whether it's a quick one-on-one or an ongoing back-and-forth,
+								Black Chat gives you the status clarity to stop guessing and
+								start knowing.
 							</p>
 							<div className="mt-6 grid gap-3 sm:grid-cols-2">
 								{workflowBenefits.map((benefit) => (
 									<GlassInner
 										key={benefit.text}
 										className={`flex items-start gap-3 p-4 ${magnifyHoverClass}`}>
-										{benefit.comingSoon ? (
-											<Clock className="mt-0.5 size-5 shrink-0 text-primary" />
-										) : (
-											<CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" />
-										)}
+										<CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" />
 										<p className="text-sm leading-6 text-foreground/90">
 											{benefit.text}
-											{benefit.comingSoon && (
-												<>
-													{" "}
-													<ComingSoonBadge />
-												</>
-											)}
 										</p>
 									</GlassInner>
 								))}
@@ -592,7 +604,7 @@ const Welcome: FC<WelcomeProps> = () => {
 								variant="solid"
 								size="lg"
 								className={`w-full justify-center capitalize ${magnifyHoverClass}`}>
-								open inbox
+								open chats
 								<ArrowRight className="size-4" />
 							</Link>
 							<Link

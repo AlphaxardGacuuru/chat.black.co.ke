@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\ChatConversation;
 use App\Models\ChatMessage;
-use App\Models\ChatThread;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -29,37 +29,21 @@ class AdminAccessTest extends TestCase
     public function test_admin_can_view_dashboard_metrics(): void
     {
         $admin = User::factory()->create(['email' => config('admin.email')]);
-        $sentThread = ChatThread::create(['user_id' => $admin->id, 'subject' => 'Sent mail']);
-        $failedThread = ChatThread::create(['user_id' => $admin->id, 'subject' => 'Failed mail']);
+        $other = User::factory()->create();
+
+        $conversation = ChatConversation::create(['type' => 'direct']);
+        $conversation->participants()->attach([$admin->id, $other->id]);
 
         ChatMessage::create([
-            'chat_thread_id' => $sentThread->id,
-            'user_id' => $admin->id,
-            'direction' => 'outbound',
-            'folder' => 'sent',
-            'from_address' => ['address' => 'sender@example.com'],
-            'to' => [['address' => 'recipient@example.com']],
-            'subject' => 'Sent mail',
-            'status' => 'sent',
-        ]);
-
-        ChatMessage::create([
-            'chat_thread_id' => $failedThread->id,
-            'user_id' => $admin->id,
-            'direction' => 'outbound',
-            'folder' => 'sent',
-            'from_address' => ['address' => 'sender@example.com'],
-            'to' => [['address' => 'bounced@example.com']],
-            'subject' => 'Failed mail',
-            'status' => 'failed',
-            'error_message' => 'Mailbox does not exist',
+            'conversation_id' => $conversation->id,
+            'sender_id' => $admin->id,
+            'body' => 'Hello there',
         ]);
 
         $response = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/dashboard');
 
         $response->assertOk()
-            ->assertJsonPath('data.totals.chatsSent', 1)
-            ->assertJsonPath('data.totals.chatsFailed', 1)
-            ->assertJsonPath('data.recentFailures.0.errorMessage', 'Mailbox does not exist');
+            ->assertJsonPath('data.totals.totalConversations', 1)
+            ->assertJsonPath('data.totals.totalMessages', 1);
     }
 }

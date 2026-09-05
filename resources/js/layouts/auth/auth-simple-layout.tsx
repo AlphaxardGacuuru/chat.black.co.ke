@@ -5,6 +5,7 @@ import AppLogoIcon from "@/components/app-logo-icon"
 import { Card, CardContent } from "@/components/ui/card"
 import { home } from "@/routes"
 import type { AuthLayoutProps } from "@/types"
+import { MessageCircle, MessagesSquare, Paperclip, Send } from "lucide-react"
 
 export default function AuthSimpleLayout({
 	children,
@@ -12,18 +13,38 @@ export default function AuthSimpleLayout({
 	description,
 }: AuthLayoutProps) {
 	return (
-		<div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
+		<div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-primary/5 p-6 md:p-10">
 			{/* START: Page Backdrop Elements */}
 			<div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
 				<div className="absolute -left-40 -top-28 h-80 w-80 rounded-full bg-primary/36 blur-3xl dark:bg-primary/28" />
 				<div className="absolute -right-24 top-36 h-96 w-96 rounded-full bg-secondary/70 blur-3xl dark:bg-secondary/35" />
 				<div className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-foreground/18 blur-3xl dark:bg-foreground/12" />
-				<div className="bg-motion-drift bg-motion-delay-1 absolute left-[43%] top-[7%] h-44 w-44 -translate-x-1/2 rounded-[2.5rem] bg-white/58 dark:bg-white/22" />
-				<div className="bg-motion-rotate bg-motion-delay-2 absolute right-[3%] top-[15%] h-36 w-36 rotate-12 rounded-3xl bg-secondary/85 dark:bg-secondary/40" />
-				<div className="bg-motion-float bg-motion-delay-3 absolute bottom-[38%] left-[36%] h-48 w-48 -rotate-12 rounded-full bg-primary/46 dark:bg-primary/34" />
-				<div className="bg-motion-drift absolute bottom-[12%] right-[20%] h-56 w-56 rounded-[3rem] bg-secondary/60 dark:bg-secondary/25" />
+				<div className="bg-motion-drift bg-motion-delay-1 absolute left-[43%] top-[7%] flex h-20 w-20 -translate-x-1/2 items-center justify-center rounded-[1.75rem] border border-white/60 bg-white/58 text-primary shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-white/10">
+					<MessageCircle
+						className="size-9"
+						strokeWidth={1.5}
+					/>
+				</div>
+				<div className="bg-motion-rotate bg-motion-delay-2 absolute right-[3%] top-[15%] flex h-16 w-16 rotate-12 items-center justify-center rounded-3xl border border-white/60 bg-secondary/85 text-secondary-foreground shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-secondary/40">
+					<Send
+						className="size-7 -rotate-12"
+						strokeWidth={1.5}
+					/>
+				</div>
+				<div className="bg-motion-float bg-motion-delay-3 absolute bottom-[38%] left-[36%] flex h-24 w-24 -rotate-12 items-center justify-center rounded-full border border-white/60 bg-primary/46 text-primary-foreground shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-primary/34">
+					<MessagesSquare
+						className="size-10 rotate-12"
+						strokeWidth={1.5}
+					/>
+				</div>
+				<div className="bg-motion-drift absolute bottom-[12%] right-[20%] flex h-28 w-28 items-center justify-center rounded-[3rem] border border-white/60 bg-secondary/60 text-secondary-foreground shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-secondary/25">
+					<Paperclip
+						className="size-11"
+						strokeWidth={1.5}
+					/>
+				</div>
 				{/* Brand Background Gradient Start */}
-				<div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(143,255,224,0.18),transparent_35%),radial-gradient(circle_at_88%_14%,rgba(0,49,58,0.55),transparent_40%),linear-gradient(to_bottom,transparent,rgba(143,255,224,0.08),transparent)] dark:bg-[radial-gradient(circle_at_12%_10%,rgba(143,255,224,0.22),transparent_35%),radial-gradient(circle_at_88%_14%,rgba(0,49,58,0.22),transparent_40%),linear-gradient(to_bottom,transparent,rgba(143,255,224,0.12),transparent)]" />
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(255,0,102,0.18),transparent_35%),radial-gradient(circle_at_88%_14%,rgba(255,239,184,0.55),transparent_40%),linear-gradient(to_bottom,transparent,rgba(255,0,102,0.08),transparent)] dark:bg-[radial-gradient(circle_at_12%_10%,rgba(255,0,102,0.22),transparent_35%),radial-gradient(circle_at_88%_14%,rgba(255,239,184,0.22),transparent_40%),linear-gradient(to_bottom,transparent,rgba(255,0,102,0.12),transparent)]" />
 				{/* Brand Background Gradient End */}
 				<div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.75)_1px,transparent_1px)] bg-size-[16px_16px] opacity-[0.12] dark:opacity-[0.05]" />
 				<div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.32)_0%,transparent_30%,rgba(148,163,184,0.2)_50%,transparent_70%,rgba(255,255,255,0.22)_100%)] opacity-[0.26] dark:opacity-[0.12]" />
