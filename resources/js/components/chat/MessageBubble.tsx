@@ -22,7 +22,7 @@ export default function MessageBubble({ message, isOwn }: Props) {
 				className={cn(
 					"max-w-[75%] space-y-2 rounded-2xl px-3 py-2 text-sm shadow-sm",
 					isOwn
-						? "rounded-br-sm bg-primary text-primary-foreground"
+						? "rounded-br-sm bg-primary/50 text-primary-foreground"
 						: "rounded-bl-sm bg-muted text-foreground"
 				)}>
 				{message.body && <p className="whitespace-pre-wrap break-words">{message.body}</p>}

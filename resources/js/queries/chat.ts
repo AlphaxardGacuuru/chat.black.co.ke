@@ -92,16 +92,16 @@ export function useDeleteMessage(conversationId: string) {
 export type ChatUserSearchResult = {
 	id: string
 	name: string
+	email: string
 	avatar: string | null
 }
 
-export function useSearchChatUsers(query: string) {
+export function useChatUsers(query: string) {
 	return useQuery({
 		queryKey: ["chat", "user-search", query],
 		queryFn: () =>
 			Axios.get<{ data: ChatUserSearchResult[] }>("api/users", {
-				params: { name: query },
+				params: { name: query, per_page: 20, excludeSelf: true },
 			}).then((res) => res.data.data),
-		enabled: query.trim().length > 0,
 	})
 }

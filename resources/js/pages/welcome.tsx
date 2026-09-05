@@ -600,7 +600,7 @@ const Welcome: FC<WelcomeProps> = () => {
 
 						<div className="flex flex-col gap-3 lg:min-w-64">
 							<Link
-								href="/chat"
+								href="/chats"
 								variant="solid"
 								size="lg"
 								className={`w-full justify-center capitalize ${magnifyHoverClass}`}>

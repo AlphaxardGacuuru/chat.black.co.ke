@@ -27,6 +27,7 @@ class ChatConversationResource extends JsonResource
             'otherUser' => $otherParticipant ? [
                 'id' => $otherParticipant->id,
                 'name' => $otherParticipant->name,
+                'email' => $otherParticipant->email,
                 'avatar' => $otherParticipant->avatar,
                 'lastSeenAt' => $otherParticipant->last_seen_at,
             ] : null,

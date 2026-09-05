@@ -24,9 +24,13 @@ class UserService extends Service
 
 		$query = $this->search(User::query(), $request);
 
+		if ($request->boolean('excludeSelf') && auth()->check()) {
+			$query = $query->whereKeyNot(auth()->id());
+		}
+
 		return $query
 			->orderBy('id', 'DESC')
-			->paginate();
+			->paginate($request->integer('per_page', 15));
 	}
 
 	public function show(int|string $id): User

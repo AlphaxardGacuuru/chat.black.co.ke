@@ -35,10 +35,10 @@ export default function ConversationListRow({ conversation, isSelected, onSelect
 			type="button"
 			onClick={onSelect}
 			className={cn(
-				"flex w-full items-center gap-3 border-b px-3 py-3 text-left transition-colors hover:bg-muted/50",
-				isSelected && "bg-muted"
+				"flex w-full items-center gap-2 rounded-lg border bg-card px-2 py-2 text-left shadow-sm transition-all hover:-translate-y-px hover:shadow-md md:gap-3 md:rounded-xl md:px-3 md:py-3",
+				isSelected && "border-primary/50 bg-muted"
 			)}>
-			<Avatar className="size-11 shrink-0">
+			<Avatar className="size-14 shrink-0">
 				<AvatarImage
 					src={otherUser?.avatar ?? undefined}
 					alt={otherUser?.name}
@@ -48,13 +48,18 @@ export default function ConversationListRow({ conversation, isSelected, onSelect
 
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center justify-between gap-2">
-					<span className={cn("truncate", unreadCount > 0 && "font-semibold")}>
+					<span className={cn("truncate", unreadCount > 0 && "font-semibold text-primary")}>
 						{otherUser?.name ?? "Unknown"}
 					</span>
 					<span className="shrink-0 text-xs text-muted-foreground">
 						{formatTime(lastMessageAt)}
 					</span>
 				</div>
+				{otherUser?.email && (
+					<span className="block truncate text-xs text-muted-foreground">
+						{otherUser.email}
+					</span>
+				)}
 				<div className="flex items-center justify-between gap-2">
 					<span
 						className={cn(

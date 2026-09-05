@@ -158,8 +158,8 @@ export default function ConversationView({ conversationId, variant, onBack }: Pr
 	const isOnline = otherUser ? onlineUserIds.has(otherUser.id) : false
 
 	return (
-		<div className="flex flex-1 flex-col overflow-hidden">
-			<div className="flex items-center gap-2 border-b p-3">
+		<div className="relative flex flex-1 flex-col overflow-hidden">
+			<div className="flex items-center gap-2 p-3">
 				{variant === "page" && (
 					<Button
 						variant="ghost"
@@ -169,7 +169,7 @@ export default function ConversationView({ conversationId, variant, onBack }: Pr
 					</Button>
 				)}
 
-				<Avatar className="size-9">
+				<Avatar className="size-10">
 					<AvatarImage
 						src={otherUser?.avatar ?? undefined}
 						alt={otherUser?.name}
@@ -191,7 +191,7 @@ export default function ConversationView({ conversationId, variant, onBack }: Pr
 				</div>
 			</div>
 
-			<div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
+			<div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3 pb-24">
 				{messages.map((message) => (
 					<MessageBubble
 						key={message.id}
@@ -199,9 +199,9 @@ export default function ConversationView({ conversationId, variant, onBack }: Pr
 						isOwn={message.senderId === myId}
 					/>
 				))}
-			</div>
 
-			{isOtherTyping && otherUser && <TypingIndicator name={otherUser.name} />}
+				{isOtherTyping && otherUser && <TypingIndicator name={otherUser.name} />}
+			</div>
 
 			<MessageComposer
 				conversationId={conversationId}

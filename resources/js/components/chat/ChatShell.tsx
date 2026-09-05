@@ -22,7 +22,7 @@ export default function ChatShell({ initialConversationId }: Props) {
 
 	function handleSelect(id: string) {
 		if (isMobile) {
-			navigate({ to: "/chat/$id/show", params: { id } })
+			navigate({ to: "/chats/$id/show", params: { id } })
 		} else {
 			setPane({ type: "conversation", id })
 		}
@@ -30,7 +30,7 @@ export default function ChatShell({ initialConversationId }: Props) {
 
 	if (isMobile) {
 		return (
-			<div className="flex h-[calc(100vh-4rem)] flex-col">
+			<div className="flex h-[calc(100dvh-4rem)] flex-col overflow-hidden">
 				<ConversationList
 					selectedId={null}
 					onSelect={handleSelect}

@@ -15,16 +15,22 @@ export function AppSidebarHeader({
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	})
-	const conversationId = pathname.match(/^\/chat\/([^/]+)\/show/)?.[1]
+	const conversationId = pathname.match(/^\/chats\/([^/]+)\/show/)?.[1]
 	const { data } = useConversation(conversationId ?? null)
-	const chatTitle = conversationId
-		? (data?.conversation.otherUser?.name ?? "Chat")
-		: pathname === "/chat" || pathname === "/chat/"
-			? "Chats"
-			: null
-	const displayedBreadcrumbs = chatTitle
-		? [{ title: chatTitle, href: pathname }]
-		: breadcrumbs
+	const chatBreadcrumbs: BreadcrumbItemType[] | null = conversationId
+		? [
+				{ title: "Chats", href: "/chats" },
+				{ title: data?.conversation.otherUser?.name ?? "Chat", href: pathname },
+			]
+		: pathname === "/chats/new"
+			? [
+					{ title: "Chats", href: "/chats" },
+					{ title: "New chat", href: pathname },
+				]
+			: pathname === "/chats" || pathname === "/chats/"
+				? [{ title: "Chats", href: pathname }]
+				: null
+	const displayedBreadcrumbs = chatBreadcrumbs ?? breadcrumbs
 
 	return (
 		<header

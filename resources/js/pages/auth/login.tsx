@@ -86,7 +86,7 @@ export default function Login({
 						invalidateAuth()
 
 						navigate({
-							to: tenantLogin ? "/tenant/dashboard" : "/chat",
+							to: tenantLogin ? "/tenant/dashboard" : "/chats",
 						})
 					})
 					.catch((err: unknown) => {

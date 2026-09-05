@@ -22,13 +22,13 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar"
-const HOME_URL = "/chat"
+const HOME_URL = "/chats"
 import type { NavItem } from "@/types"
 
 export const mainNavItems: NavItem[] = [
 	{
 		title: "Chat",
-		href: "/chat",
+		href: "/chats",
 		icon: MessageSquare,
 	},
 ]

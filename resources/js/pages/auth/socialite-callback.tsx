@@ -62,7 +62,7 @@ export default function SocialiteCallback() {
 				setLocalStorage("sanctumToken", token)
 				invalidateAuth()
 				toast.success(message ?? "Logged in")
-				navigate({ to: "/chat" })
+				navigate({ to: "/chats" })
 				return
 			}
 

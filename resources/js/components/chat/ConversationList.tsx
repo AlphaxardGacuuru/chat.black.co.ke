@@ -1,8 +1,7 @@
-import { useState } from "react"
+import { useNavigate } from "@tanstack/react-router"
 import { Plus } from "lucide-react"
 import ChatEmptyState from "@/components/chat/ChatEmptyState"
 import ConversationListRow from "@/components/chat/ConversationListRow"
-import NewConversationDialog from "@/components/chat/NewConversationDialog"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useConversations } from "@/queries/chat"
@@ -14,21 +13,17 @@ type Props = {
 
 export default function ConversationList({ selectedId, onSelect }: Props) {
 	const { data: conversations, isLoading } = useConversations()
-	const [showNewChat, setShowNewChat] = useState(false)
+	const navigate = useNavigate()
 
 	return (
 		<div className="relative flex h-full flex-col">
-			<div className="border-b p-3">
-				<h2 className="text-lg font-semibold">Chats</h2>
-			</div>
-
-			<div className="flex-1 overflow-y-auto">
+			<div className="flex-1 space-y-1 overflow-y-auto p-1.5 md:space-y-2 md:p-3">
 				{isLoading && (
-					<div className="space-y-2 p-3">
-						<Skeleton className="h-14 w-full" />
-						<Skeleton className="h-14 w-full" />
-						<Skeleton className="h-14 w-full" />
-					</div>
+					<>
+						<Skeleton className="h-16 w-full rounded-xl" />
+						<Skeleton className="h-16 w-full rounded-xl" />
+						<Skeleton className="h-16 w-full rounded-xl" />
+					</>
 				)}
 
 				{!isLoading && (conversations?.length ?? 0) === 0 && (
@@ -50,19 +45,10 @@ export default function ConversationList({ selectedId, onSelect }: Props) {
 				size="icon"
 				aria-label="New chat"
 				title="New chat"
-				className="absolute right-6 bottom-6 z-50 size-14 rounded-full shadow-lg"
-				onClick={() => setShowNewChat(true)}>
+				className="fixed right-4 bottom-[calc(6rem+1rem+env(safe-area-inset-bottom))] z-50 size-14 rounded-full shadow-lg md:absolute md:right-6 md:bottom-6"
+				onClick={() => navigate({ to: "/chats/new" })}>
 				<Plus className="size-6" strokeWidth={1.5} />
 			</Button>
-
-			<NewConversationDialog
-				open={showNewChat}
-				onOpenChange={setShowNewChat}
-				onStarted={(conversationId) => {
-					setShowNewChat(false)
-					onSelect(conversationId)
-				}}
-			/>
 		</div>
 	)
 }

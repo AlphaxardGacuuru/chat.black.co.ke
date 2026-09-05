@@ -75,7 +75,7 @@ export default function TwoFactorChallenge() {
 				setLocalStorage("sanctumToken", response.data.data)
 				invalidateAuth()
 				toast.success(response.data.message ?? "Logged in")
-				navigate({ to: "/chat" })
+				navigate({ to: "/chats" })
 			})
 			.catch((err: unknown) => {
 				const e = err as {

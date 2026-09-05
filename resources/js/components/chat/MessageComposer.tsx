@@ -63,113 +63,116 @@ export default function MessageComposer({ conversationId, onTyping }: Props) {
 	}
 
 	return (
-		<div className="flex flex-col gap-2 border-t bg-background p-3">
-			{showAttachments && (
-				<FilePond
-					ref={pondRef}
-					name="filepond-chat-attachments"
-					allowMultiple
-					maxFileSize="25MB"
-					credits={false}
-					labelIdle='<span class="filepond--label-action">Attach files</span> or drag and drop'
-					server={{
-						process: (
-							fieldName,
-							file,
-							_metadata,
-							load,
-							error,
-							progress,
-							abort
-						) => {
-							const controller = new AbortController()
-							const formData = new FormData()
-							formData.append(fieldName, file, file.name)
+		<div className="pointer-events-none fixed inset-x-0 bottom-0 z-10 px-3 pb-3 md:absolute">
+			<div className="bg-card pointer-events-auto flex flex-col gap-2 rounded-4xl border p-1 shadow-lg backdrop-blur supports-backdrop-filter:bg-card/95">
+				{showAttachments && (
+					<FilePond
+						ref={pondRef}
+						name="filepond-chat-attachments"
+						allowMultiple
+						maxFileSize="25MB"
+						credits={false}
+						labelIdle='<span class="filepond--label-action">Attach files</span> or drag and drop'
+						server={{
+							process: (
+								fieldName,
+								file,
+								_metadata,
+								load,
+								error,
+								progress,
+								abort
+							) => {
+								const controller = new AbortController()
+								const formData = new FormData()
+								formData.append(fieldName, file, file.name)
 
-							Axios.post(FilePondController.storeChatAttachment.url(), formData, {
-								signal: controller.signal,
-								onUploadProgress: (event) => {
-									if (event.total) {
-										progress(true, event.loaded, event.total)
-									}
-								},
-							})
-								.then((response) => load(String(response.data)))
-								.catch((requestError) => {
-									if (isCancel(requestError)) {
-										return
-									}
-									error("Upload failed")
+								Axios.post(FilePondController.storeChatAttachment.url(), formData, {
+									signal: controller.signal,
+									onUploadProgress: (event) => {
+										if (event.total) {
+											progress(true, event.loaded, event.total)
+										}
+									},
 								})
+									.then((response) => load(String(response.data)))
+									.catch((requestError) => {
+										if (isCancel(requestError)) {
+											return
+										}
+										error("Upload failed")
+									})
 
-							return {
-								abort: () => {
-									controller.abort()
-									abort()
-								},
+								return {
+									abort: () => {
+										controller.abort()
+										abort()
+									},
+								}
+							},
+							revert: (uniqueFileId, load, error) => {
+								Axios.delete(FilePondController.destroyChatAttachment.url(uniqueFileId))
+									.then(() => load())
+									.catch(() => error("Could not remove attachment"))
+							},
+						}}
+						onprocessfilestart={() => setPendingUploads((count) => count + 1)}
+						onprocessfile={(err, file: FilePondFile) => {
+							setPendingUploads((count) => Math.max(0, count - 1))
+							if (!err) {
+								setAttachmentIds((prev) => ({
+									...prev,
+									[file.id]: Number(file.serverId),
+								}))
 							}
-						},
-						revert: (uniqueFileId, load, error) => {
-							Axios.delete(FilePondController.destroyChatAttachment.url(uniqueFileId))
-								.then(() => load())
-								.catch(() => error("Could not remove attachment"))
-						},
-					}}
-					onprocessfilestart={() => setPendingUploads((count) => count + 1)}
-					onprocessfile={(err, file: FilePondFile) => {
-						setPendingUploads((count) => Math.max(0, count - 1))
-						if (!err) {
-							setAttachmentIds((prev) => ({
-								...prev,
-								[file.id]: Number(file.serverId),
-							}))
+						}}
+						onprocessfileabort={() =>
+							setPendingUploads((count) => Math.max(0, count - 1))
 						}
-					}}
-					onprocessfileabort={() =>
-						setPendingUploads((count) => Math.max(0, count - 1))
-					}
-					onremovefile={(_err, file: FilePondFile) => {
-						setAttachmentIds((prev) => {
-							const next = { ...prev }
-							delete next[file.id]
-							return next
-						})
-					}}
-				/>
-			)}
+						onremovefile={(_err, file: FilePondFile) => {
+							setAttachmentIds((prev) => {
+								const next = { ...prev }
+								delete next[file.id]
+								return next
+							})
+						}}
+					/>
+				)}
 
-			<div className="flex items-end gap-2">
-				<Button
-					type="button"
-					variant="ghost"
-					size="icon"
-					aria-label="Attach files"
-					title="Attach files"
-					onClick={() => setShowAttachments((value) => !value)}>
-					<Paperclip className="size-5" />
-				</Button>
+				<div className="flex items-center gap-1">
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						aria-label="Attach files"
+						title="Attach files"
+						onClick={() => setShowAttachments((value) => !value)}>
+						<Paperclip className="size-5" />
+					</Button>
 
-				<textarea
-					value={body}
-					onChange={(event) => {
-						setBody(event.target.value)
-						onTyping?.()
-					}}
-					onKeyDown={handleKeyDown}
-					placeholder="Type a message"
-					rows={1}
-					className="max-h-32 flex-1 resize-none rounded-full border bg-muted/40 px-4 py-2 text-sm outline-none focus:bg-background"
-				/>
+					<textarea
+						value={body}
+						onChange={(event) => {
+							setBody(event.target.value)
+							onTyping?.()
+						}}
+						onKeyDown={handleKeyDown}
+						placeholder="Type a message"
+						rows={1}
+						className="max-h-32 flex-1 resize-none rounded-full p-1 text-sm outline-none focus:bg-background"
+					/>
 
-				<Button
-					type="button"
-					size="icon"
-					aria-label="Send"
-					title="Send"
-					disabled={!canSend || sendMessage.isPending}
-					onClick={handleSend}>
-					<Send className="size-4" />
-				</Button>
+					<Button
+						type="button"
+						size="icon"
+						aria-label="Send"
+						title="Send"
+						className="rounded-full"
+						disabled={!canSend || sendMessage.isPending}
+						onClick={handleSend}>
+						<Send className="size-4" />
+					</Button>
+				</div>
 			</div>
 		</div>
 	)

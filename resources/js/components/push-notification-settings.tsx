@@ -85,6 +85,9 @@ export default function PushNotificationSettings() {
 							? "Notifications are blocked. Allow them for this site in your browser settings."
 							: "Get a native alert when new chats arrive."}
 					</p>
+					<p className="text-xs text-muted-foreground/70">
+						Permission: {permission} · Subscribed: {isSubscribed ? "yes" : "no"}
+					</p>
 				</div>
 				<div className="flex items-center gap-2">
 					{processing && <Spinner className="size-4 text-muted-foreground" />}

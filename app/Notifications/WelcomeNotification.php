@@ -45,7 +45,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
             ->subject('Welcome to Black Chat!')
             ->greeting('Hello '.$notifiable->name.',')
             ->line("Thank you for joining Black Chat. We are excited to have you on board!")
-            ->action('Go To Inbox', url('/chat'));
+            ->action('Go To Inbox', url('/chats'));
     }
 
     /**

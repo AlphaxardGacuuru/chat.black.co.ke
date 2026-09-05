@@ -1,6 +1,7 @@
 export type ChatUser = {
 	id: string
 	name: string
+	email: string
 	avatar: string | null
 	lastSeenAt: string | null
 }

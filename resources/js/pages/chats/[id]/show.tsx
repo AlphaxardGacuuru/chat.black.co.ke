@@ -9,11 +9,11 @@ export default function ChatShow({ id }: { id: string }) {
 		<>
 			<Head title="Chat" />
 
-			<div className="flex h-[calc(100vh-4rem)] flex-col border rounded-lg overflow-hidden">
+			<div className="flex h-[calc(100vh-4rem)] flex-col rounded-lg overflow-hidden">
 				<ConversationView
 					conversationId={id}
 					variant="page"
-					onBack={() => navigate({ to: "/chat" })}
+					onBack={() => navigate({ to: "/chats" })}
 				/>
 			</div>
 		</>
