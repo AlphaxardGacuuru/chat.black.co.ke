@@ -1,7 +1,7 @@
 {
 	"name": "Black Chat",
 	"short_name": "Black Chat",
-	"description": "An email client with read receipts built in, see when every message is queued, sent, delivered, and opened.",
+	"description": "A real-time chat with read receipts built in, see when every message is sent and read.",
 	"start_url": "/",
 	"scope": "/",
 	"display": "standalone",
