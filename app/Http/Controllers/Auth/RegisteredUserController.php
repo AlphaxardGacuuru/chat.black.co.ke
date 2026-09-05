@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
@@ -36,6 +37,8 @@ class RegisteredUserController extends Controller
             'invoiceReminderNotification' => true,
         ];
         $user->save();
+
+        Auth::login($user);
 
         $token = $user
             ->createToken($request->device_name)

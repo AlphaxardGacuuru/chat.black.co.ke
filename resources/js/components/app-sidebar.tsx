@@ -27,7 +27,7 @@ import type { NavItem } from "@/types"
 
 export const mainNavItems: NavItem[] = [
 	{
-		title: "Chat",
+		title: "Chats",
 		href: "/chats",
 		icon: MessageSquare,
 	},

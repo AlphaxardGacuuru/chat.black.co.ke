@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
@@ -42,6 +43,8 @@ class TwoFactorChallengeController extends Controller
         }
 
         Cache::forget("2fa_pending:{$request->pending_token}");
+
+        Auth::login($user);
 
         $token = $user->createToken('web')->plainTextToken;
 

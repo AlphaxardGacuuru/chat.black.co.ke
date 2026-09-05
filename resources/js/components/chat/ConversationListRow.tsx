@@ -64,7 +64,7 @@ export default function ConversationListRow({ conversation, isSelected, onSelect
 					<span
 						className={cn(
 							"truncate text-sm",
-							unreadCount > 0 ? "font-medium text-foreground" : "text-muted-foreground"
+							unreadCount > 0 ? "font-medium text-primary" : "text-muted-foreground"
 						)}>
 						{lastMessage?.body || "No messages yet"}
 					</span>

@@ -82,6 +82,8 @@ class AuthenticatedSessionController extends Controller
             event(new Registered($dbUser));
         }
 
+        Auth::login($dbUser);
+
         $token = $dbUser->createToken('web')->plainTextToken;
 
         return redirect('/socialite-callback?token=' . urlencode($token) . '&message=' . urlencode('Logged in') . '&provider=' . urlencode($website));
@@ -124,6 +126,8 @@ class AuthenticatedSessionController extends Controller
             ], 200);
         }
 
+        Auth::login($user);
+
         $token = $user
             ->createToken("$request->device_name")
             ->plainTextToken;
@@ -145,12 +149,12 @@ class AuthenticatedSessionController extends Controller
             return response(["message" => "No active authenticated user found"], 401);
         }
 
+        $user->currentAccessToken()->delete();
+
         if (Auth::guard('web')->check()) {
             Auth::guard('web')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-        } else {
-            $user->currentAccessToken()->delete();
         }
 
         return response(["message" => "Logged Out"], 200);
