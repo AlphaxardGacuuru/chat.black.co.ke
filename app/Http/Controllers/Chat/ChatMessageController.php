@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Chat;
 
+use App\Events\ChatMessageSent;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ChatMessageResource;
 use App\Http\Services\ChatMessageService;
@@ -17,13 +18,17 @@ class ChatMessageController extends Controller
         $this->validate($request, [
             'body' => 'nullable|string',
             'temporaryUploadIds' => 'sometimes|array',
+            'replyToId' => 'nullable|uuid',
         ]);
 
         [$saved, $message, $chatMessage] = $this->service->send(
             $conversationId,
             $request->input('body'),
-            $request->input('temporaryUploadIds', [])
+            $request->input('temporaryUploadIds', []),
+            $request->input('replyToId')
         );
+
+        ChatMessageSent::dispatchIf($saved, $chatMessage);
 
         return response()->json([
             'saved' => $saved,
@@ -39,6 +44,35 @@ class ChatMessageController extends Controller
         return response()->json([
             'deleted' => $deleted,
             'message' => $message,
+        ]);
+    }
+
+    public function star(string $id): JsonResponse
+    {
+        [$status, $message, $isStarred] = $this->service->toggleStar($id);
+
+        return response()->json([
+            'status' => $status,
+            'message' => $message,
+            'isStarred' => $isStarred,
+        ]);
+    }
+
+    public function forward(Request $request, string $id): JsonResponse
+    {
+        $this->validate($request, ['conversationId' => 'required|uuid|exists:chat_conversations,id']);
+
+        [$saved, $message, $chatMessage] = $this->service->forward(
+            $id,
+            $request->input('conversationId')
+        );
+
+        ChatMessageSent::dispatchIf($saved, $chatMessage);
+
+        return response()->json([
+            'saved' => $saved,
+            'message' => $message,
+            'data' => $chatMessage ? ChatMessageResource::make($chatMessage) : null,
         ]);
     }
 }

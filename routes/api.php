@@ -48,8 +48,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('chat/conversations', [ChatConversationController::class, 'store']);
     Route::get('chat/conversations/{id}', [ChatConversationController::class, 'show']);
     Route::post('chat/conversations/{id}/read', [ChatConversationController::class, 'markRead']);
+    Route::post('chat/conversations/{id}/archive', [ChatConversationController::class, 'archive']);
+    Route::delete('chat/conversations/{id}', [ChatConversationController::class, 'destroy']);
     Route::post('chat/conversations/{id}/messages', [ChatMessageController::class, 'store']);
     Route::delete('chat/messages/{id}', [ChatMessageController::class, 'destroy']);
+    Route::post('chat/messages/{id}/star', [ChatMessageController::class, 'star']);
+    Route::post('chat/messages/{id}/forward', [ChatMessageController::class, 'forward']);
 
     Route::get('attachments/{id}/download', [ChatAttachmentController::class, 'download'])
         ->name('attachments.download');

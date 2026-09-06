@@ -106,4 +106,96 @@ class ChatMessageServiceTest extends TestCase
 
         (new ChatMessageService)->destroy($message->id);
     }
+
+    public function test_send_records_the_reply_to_message(): void
+    {
+        $me = User::factory()->create();
+        $other = User::factory()->create();
+        $conversation = $this->makeConversation($me, $other);
+
+        $original = ChatMessage::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $other->id,
+            'body' => 'Original message',
+        ]);
+
+        $this->actingAs($me, 'sanctum');
+        [, , $reply] = (new ChatMessageService)->send($conversation->id, 'Replying', [], $original->id);
+
+        $this->assertSame($original->id, $reply->reply_to_id);
+    }
+
+    public function test_toggle_star_stars_then_unstars_a_message(): void
+    {
+        $me = User::factory()->create();
+        $other = User::factory()->create();
+        $conversation = $this->makeConversation($me, $other);
+
+        $message = ChatMessage::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $other->id,
+            'body' => 'Star me',
+        ]);
+
+        $this->actingAs($me, 'sanctum');
+
+        [, , $isStarred] = (new ChatMessageService)->toggleStar($message->id);
+        $this->assertTrue($isStarred);
+        $this->assertDatabaseHas('chat_message_stars', ['message_id' => $message->id, 'user_id' => $me->id]);
+
+        [, , $isStarred] = (new ChatMessageService)->toggleStar($message->id);
+        $this->assertFalse($isStarred);
+        $this->assertDatabaseMissing('chat_message_stars', ['message_id' => $message->id, 'user_id' => $me->id]);
+    }
+
+    public function test_forward_copies_the_message_into_another_conversation(): void
+    {
+        $me = User::factory()->create();
+        $other = User::factory()->create();
+        $thirdParty = User::factory()->create();
+
+        $sourceConversation = $this->makeConversation($me, $other);
+        $targetConversation = $this->makeConversation($me, $thirdParty);
+
+        $message = ChatMessage::create([
+            'conversation_id' => $sourceConversation->id,
+            'sender_id' => $other->id,
+            'body' => 'Forward this',
+        ]);
+
+        $this->actingAs($me, 'sanctum');
+        [$saved, , $forwarded] = (new ChatMessageService)->forward($message->id, $targetConversation->id);
+
+        $this->assertTrue($saved);
+        $this->assertDatabaseHas('chat_messages', [
+            'id' => $forwarded->id,
+            'conversation_id' => $targetConversation->id,
+            'sender_id' => $me->id,
+            'body' => 'Forward this',
+        ]);
+        $this->assertNotNull($targetConversation->refresh()->last_message_at);
+    }
+
+    public function test_forward_fails_for_a_target_conversation_the_user_does_not_belong_to(): void
+    {
+        $me = User::factory()->create();
+        $other = User::factory()->create();
+        $a = User::factory()->create();
+        $b = User::factory()->create();
+
+        $sourceConversation = $this->makeConversation($me, $other);
+        $unrelatedConversation = $this->makeConversation($a, $b);
+
+        $message = ChatMessage::create([
+            'conversation_id' => $sourceConversation->id,
+            'sender_id' => $other->id,
+            'body' => 'Nope',
+        ]);
+
+        $this->actingAs($me, 'sanctum');
+
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
+        (new ChatMessageService)->forward($message->id, $unrelatedConversation->id);
+    }
 }

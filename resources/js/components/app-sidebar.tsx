@@ -76,7 +76,7 @@ export function AppSidebar() {
 			</SidebarHeader>
 
 			<SidebarContent>
-				<SidebarGroup className="px-2 py-0">
+				<SidebarGroup className="hidden px-2 py-0 md:block">
 					<SidebarMenu>
 						{mainNavItems.map((item) => (
 							<SidebarMenuItem key={item.title}>

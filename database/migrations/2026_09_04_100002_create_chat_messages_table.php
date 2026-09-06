@@ -16,9 +16,18 @@ return new class extends Migration
             $table->foreignUuid('sender_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
+            $table->foreignUuid('reply_to_id')
+                ->nullable()
+                ->constrained('chat_messages')
+                ->nullOnDelete();
             $table->text('body')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
+            // Microsecond precision: created_at is compared against a
+            // participant's delete cutoff (chat_conversation_participants.
+            // deleted_at) to decide what's visible to them — the default
+            // second precision can make two events milliseconds apart
+            // compare as equal instead of ordered.
+            $table->timestamps(6);
+            $table->softDeletes('deleted_at', 6);
 
             $table->index(['conversation_id', 'created_at']);
         });

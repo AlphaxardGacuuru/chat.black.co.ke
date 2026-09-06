@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Chat;
 
+use App\Events\ChatConversationRead;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ChatConversationResource;
 use App\Http\Resources\ChatMessageResource;
@@ -60,9 +61,32 @@ class ChatConversationController extends Controller
         ]);
     }
 
-    public function markRead(string $id): JsonResponse
+    public function markRead(Request $request, string $id): JsonResponse
     {
-        [$status, $message] = $this->service->markRead($id);
+        [$status, $message, $conversation] = $this->service->markRead($id);
+
+        ChatConversationRead::dispatchIf($status, $conversation, $request->user()->id);
+
+        return response()->json([
+            'status' => $status,
+            'message' => $message,
+        ]);
+    }
+
+    public function archive(string $id): JsonResponse
+    {
+        [$status, $message, $isArchived] = $this->service->toggleArchive($id);
+
+        return response()->json([
+            'status' => $status,
+            'message' => $message,
+            'isArchived' => $isArchived,
+        ]);
+    }
+
+    public function destroy(string $id): JsonResponse
+    {
+        [$status, $message] = $this->service->hideForMe($id);
 
         return response()->json([
             'status' => $status,

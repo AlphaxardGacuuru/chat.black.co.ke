@@ -14,6 +14,13 @@ export type ChatAttachment = {
 	downloadUrl: string
 }
 
+export type ChatMessageReplyPreview = {
+	id: string
+	senderId: string
+	body: string | null
+	hasAttachments: boolean
+}
+
 export type ChatMessage = {
 	id: string
 	conversationId: string
@@ -21,6 +28,8 @@ export type ChatMessage = {
 	body: string | null
 	attachments: ChatAttachment[]
 	isRead: boolean
+	isStarred: boolean
+	replyTo: ChatMessageReplyPreview | null
 	createdAt: string
 }
 
@@ -36,4 +45,5 @@ export type ChatConversation = {
 	lastMessage: ChatConversationLastMessage | null
 	unreadCount: number
 	lastMessageAt: string | null
+	isArchived: boolean
 }

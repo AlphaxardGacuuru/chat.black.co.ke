@@ -16,6 +16,13 @@ class ChatMessageResource extends JsonResource
             'body' => $this->body,
             'attachments' => ChatMessageAttachmentResource::collection($this->whenLoaded('attachments')),
             'isRead' => (bool) ($this->is_read_by_recipient ?? false),
+            'isStarred' => (bool) ($this->is_starred_by_viewer ?? false),
+            'replyTo' => $this->whenLoaded('replyTo', fn () => $this->replyTo ? [
+                'id' => $this->replyTo->id,
+                'senderId' => $this->replyTo->sender_id,
+                'body' => $this->replyTo->body,
+                'hasAttachments' => $this->replyTo->attachments->isNotEmpty(),
+            ] : null),
             'createdAt' => $this->created_at,
         ];
     }

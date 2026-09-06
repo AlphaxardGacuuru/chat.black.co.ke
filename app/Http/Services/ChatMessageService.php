@@ -2,18 +2,22 @@
 
 namespace App\Http\Services;
 
-use App\Events\ChatMessageSent;
 use App\Models\ChatConversation;
 use App\Models\ChatMessage;
 use App\Models\ChatMessageAttachment;
+use App\Models\ChatMessageStar;
 use App\Models\TemporaryUpload;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class ChatMessageService extends Service
 {
-    public function send(string $conversationId, ?string $body, array $temporaryUploadIds = []): array
-    {
+    public function send(
+        string $conversationId,
+        ?string $body,
+        array $temporaryUploadIds = [],
+        ?string $replyToId = null
+    ): array {
         $conversation = ChatConversation::forUser($this->id)->findOrFail($conversationId);
 
         if (blank($body) && empty($temporaryUploadIds)) {
@@ -22,10 +26,15 @@ class ChatMessageService extends Service
             ]);
         }
 
+        $replyTo = $replyToId
+            ? ChatMessage::where('conversation_id', $conversation->id)->findOrFail($replyToId)
+            : null;
+
         $message = new ChatMessage;
         $message->conversation_id = $conversation->id;
         $message->sender_id = $this->id;
         $message->body = $body;
+        $message->reply_to_id = $replyTo?->id;
         $saved = $message->save();
 
         if (! $saved) {
@@ -34,11 +43,7 @@ class ChatMessageService extends Service
 
         $this->attachTemporaryUploads($message, $temporaryUploadIds);
 
-        $conversation->update(['last_message_at' => $message->created_at]);
-
-        $message->load(['sender', 'attachments']);
-
-        ChatMessageSent::dispatch($message);
+        $this->finalizeNewMessage($conversation, $message);
 
         return [true, 'Message Sent', $message];
     }
@@ -49,6 +54,72 @@ class ChatMessageService extends Service
         $deleted = $message->delete();
 
         return [$deleted, 'Message Deleted'];
+    }
+
+    public function toggleStar(string $id): array
+    {
+        $message = ChatMessage::whereHas(
+            'conversation',
+            fn ($query) => $query->forUser($this->id)
+        )->findOrFail($id);
+
+        $star = ChatMessageStar::where('message_id', $message->id)
+            ->where('user_id', $this->id)
+            ->first();
+
+        if ($star) {
+            $star->delete();
+
+            return [true, 'Message Unstarred', false];
+        }
+
+        ChatMessageStar::create(['message_id' => $message->id, 'user_id' => $this->id]);
+
+        return [true, 'Message Starred', true];
+    }
+
+    public function forward(string $id, string $targetConversationId): array
+    {
+        $source = ChatMessage::whereHas(
+            'conversation',
+            fn ($query) => $query->forUser($this->id)
+        )->with('attachments')->findOrFail($id);
+
+        $targetConversation = ChatConversation::forUser($this->id)->findOrFail($targetConversationId);
+
+        if (blank($source->body) && $source->attachments->isEmpty()) {
+            throw ValidationException::withMessages([
+                'message' => ['This message can no longer be forwarded.'],
+            ]);
+        }
+
+        $forwarded = new ChatMessage;
+        $forwarded->conversation_id = $targetConversation->id;
+        $forwarded->sender_id = $this->id;
+        $forwarded->body = $source->body;
+        $forwarded->save();
+
+        foreach ($source->attachments as $attachment) {
+            $copy = new ChatMessageAttachment;
+            $copy->message_id = $forwarded->id;
+            $copy->disk = $attachment->disk;
+            $copy->path = $attachment->path;
+            $copy->original_name = $attachment->original_name;
+            $copy->mime_type = $attachment->mime_type;
+            $copy->size = $attachment->size;
+            $copy->save();
+        }
+
+        $this->finalizeNewMessage($targetConversation, $forwarded);
+
+        return [true, 'Message Forwarded', $forwarded];
+    }
+
+    protected function finalizeNewMessage(ChatConversation $conversation, ChatMessage $message): void
+    {
+        $conversation->update(['last_message_at' => $message->created_at]);
+
+        $message->load(['sender', 'attachments', 'replyTo.attachments']);
     }
 
     protected function attachTemporaryUploads(ChatMessage $message, array $temporaryUploadIds): void
