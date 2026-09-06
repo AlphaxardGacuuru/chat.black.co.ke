@@ -56,7 +56,7 @@ export default function ConversationListRow({
 				/>
 				<AvatarFallback>{initials(otherUser?.name)}</AvatarFallback>
 				{isOnline && (
-					<span className="absolute right-0.5 bottom-0.5 size-3 rounded-full bg-green-500 ring-2 ring-card" />
+					<span className="absolute right-0.5 bottom-0.5 z-10 size-3 rounded-full bg-green-500 ring-2 ring-card" />
 				)}
 			</Avatar>
 

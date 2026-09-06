@@ -48,7 +48,7 @@ export function AppSidebarHeader({
 	return (
 		<header
 			className={cn(
-				"sticky top-0 z-30 flex shrink-0 flex-col gap-2 py-3 text-sidebar-foreground transition-[width,height] ease-linear md:h-16 md:flex-row md:items-center md:py-0 md:group-has-data-[collapsible=icon]/sidebar-wrapper:h-12",
+				"sticky top-0 z-30 flex shrink-0 flex-row items-center gap-2 py-3 text-sidebar-foreground transition-[width,height] ease-linear md:h-16 md:py-0 md:group-has-data-[collapsible=icon]/sidebar-wrapper:h-12",
 				variant === "default" &&
 					"border-b border-sidebar-border bg-sidebar px-6 md:px-4",
 				variant === "floating" &&
@@ -63,7 +63,7 @@ export function AppSidebarHeader({
 
 			<span
 				className={cn(
-					"inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+					"inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
 					connectionStatus === "connected"
 						? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400"
 						: "border-muted-foreground/20 bg-muted text-muted-foreground"
