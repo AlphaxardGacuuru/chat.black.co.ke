@@ -71,13 +71,13 @@ registerRoute(
 	})
 )
 
-// Dashboard & property read API routes: stale-while-revalidate for snappy loads.
-// Auth-sensitive routes (payments, billing) are intentionally excluded.
+// Read API routes: stale-while-revalidate so the last-fetched response
+// renders immediately — offline or not — while a fresh copy is fetched in
+// the background for next time. Auth-sensitive routes are intentionally
+// excluded below.
 const STALE_WHILE_REVALIDATE_APIS = [
-	"/api/dashboard",
-	"/api/properties",
 	"/api/notifications",
-	"/api/staff",
+	"/api/chat/conversations",
 ]
 
 registerRoute(
@@ -97,13 +97,8 @@ registerRoute(
 	})
 )
 
-// Auth and payment API routes: always network-first, never serve stale data.
-const NETWORK_ONLY_APIS = [
-	"/api/auth",
-	"/api/payments",
-	"/api/billing",
-	"/api/broadcasting",
-]
+// Auth routes: always network-first, never serve stale data.
+const NETWORK_ONLY_APIS = ["/api/auth", "/api/broadcasting"]
 
 registerRoute(
 	({ url }) =>
@@ -187,7 +182,10 @@ self.addEventListener("push", (event) => {
 	}
 
 	event.waitUntil(
-		self.registration.showNotification(payload.title ?? "New notification", options)
+		self.registration.showNotification(
+			payload.title ?? "New notification",
+			options
+		)
 	)
 })
 

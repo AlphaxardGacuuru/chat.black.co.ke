@@ -1,6 +1,7 @@
 import { configureEcho } from "@laravel/echo-react"
 import { Workbox } from "workbox-window"
 import Axios from "@/lib/axios"
+import toast from "@/lib/toast"
 import { StrictMode, createElement, useMemo } from "react"
 import type { ComponentType, ReactNode } from "react"
 import { createRoot } from "react-dom/client"
@@ -13,7 +14,12 @@ import {
 } from "@tanstack/react-router"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { queryClient } from "@/lib/query-client"
-import { requireAdmin, requireAuth, requireGuest, requireSuperAdmin } from "@/middleware/auth"
+import {
+	requireAdmin,
+	requireAuth,
+	requireGuest,
+	requireSuperAdmin,
+} from "@/middleware/auth"
 import { AppPageProvider, useLayoutProps, usePage } from "@/lib/spa"
 import { Toaster, FlashToastHandler } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -244,10 +250,22 @@ rootedContainer._reactRoot.render(
 if ("serviceWorker" in navigator) {
 	const wb = new Workbox("/sw.js")
 
-	// When a new service worker is waiting, reload once it activates so
-	// users always get the latest build assets without a manual refresh.
+	// A new service worker is installed and waiting — don't force a reload
+	// mid-session (that can drop an in-progress draft or scroll position).
+	// Let the user pick the moment via the toast instead.
 	wb.addEventListener("waiting", () => {
-		wb.messageSkipWaiting()
+		toast("A new version is available", {
+			duration: Infinity,
+			action: {
+				label: "Refresh",
+				onClick: () => {
+					wb.addEventListener("controlling", () => {
+						window.location.reload()
+					})
+					wb.messageSkipWaiting()
+				},
+			},
+		})
 	})
 
 	wb.register().catch(() => {
@@ -268,15 +286,16 @@ configureEcho({
 	authorizer: (channel) => {
 		return {
 			authorize: (socketId, callback) => {
-				Axios
-					.post("/api/broadcasting/auth", {
-						socket_id: socketId,
-						channel_name: channel.name,
-					})
+				Axios.post("/api/broadcasting/auth", {
+					socket_id: socketId,
+					channel_name: channel.name,
+				})
 					.then((response) => callback(null, response.data))
 					.catch((error: unknown) => {
 						const callbackError =
-							error instanceof Error ? error : new Error("Broadcast auth failed")
+							error instanceof Error
+								? error
+								: new Error("Broadcast auth failed")
 
 						callback(callbackError, null)
 					})
