@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
+import VerifiedBadge from "@/components/verified-badge"
 import { Head } from "@/lib/spa"
 import toast from "@/lib/toast"
 import { useChatUsers, useStartConversation } from "@/queries/chat"
@@ -68,15 +69,22 @@ export default function ChatNew() {
 								disabled={startConversation.isPending}
 								onClick={() => handlePick(user.id)}
 								className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-muted disabled:opacity-50">
-								<Avatar className="size-9">
+								<Avatar className="size-9 shrink-0">
 									<AvatarImage
 										src={user.avatar ?? undefined}
 										alt={user.name}
 									/>
-									<AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+									<AvatarFallback>
+										{user.name.slice(0, 2).toUpperCase()}
+									</AvatarFallback>
 								</Avatar>
 								<div className="grid min-w-0 flex-1 text-left leading-tight">
-									<span className="truncate font-medium">{user.name}</span>
+									<span className="flex min-w-0 items-center gap-1 font-medium">
+										<span className="min-w-0 truncate">{user.name}</span>
+										{user.verified && (
+											<VerifiedBadge className="size-3.5 shrink-0" />
+										)}
+									</span>
 									<span className="truncate text-xs text-muted-foreground">
 										{user.email}
 									</span>

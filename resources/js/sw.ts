@@ -161,6 +161,7 @@ type PushPayload = {
 	title?: string
 	body?: string
 	icon?: string
+	badge?: string
 	tag?: string
 	renotify?: boolean
 	data?: { url?: string }
@@ -178,7 +179,8 @@ self.addEventListener("push", (event) => {
 	// instead of casting away the rest of the options' type-checking.
 	const options: NotificationOptions & { renotify?: boolean } = {
 		body: payload.body,
-		icon: payload.icon ?? "/favicon.ico",
+		icon: payload.icon ?? "/android-chrome-192x192.png",
+		badge: payload.badge ?? "/android-chrome-192x192.png",
 		tag: payload.tag,
 		renotify: payload.renotify,
 		data: payload.data,

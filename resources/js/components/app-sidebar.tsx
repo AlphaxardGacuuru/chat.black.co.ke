@@ -2,7 +2,6 @@ import { Link } from "@/components/ui/link"
 import { Download, MessageSquare } from "lucide-react"
 import { AdminNav } from "@/components/admin/AdminNav"
 import AppLogo from "@/components/app-logo"
-import AutoPushPrompt from "@/components/auto-push-prompt"
 import { NavFooter } from "@/components/nav-footer"
 import { NavNotifications } from "@/components/nav-notifications"
 import { NavUser } from "@/components/nav-user"
@@ -50,11 +49,9 @@ export function AppSidebar() {
 
 	return (
 		<Sidebar
-			side="left"
+			side="right"
 			collapsible="icon"
 			variant="floating">
-			<AutoPushPrompt />
-
 			<SidebarHeader>
 				<div className="flex items-center">
 					<SidebarMenu className="min-w-0 flex-1">

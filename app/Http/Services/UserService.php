@@ -79,6 +79,10 @@ class UserService extends Service
 			$user->settings = $request->input('settings');
 		}
 
+		if ($request->has('verified')) {
+			$user->verified = $request->boolean('verified');
+		}
+
 		$saved = $user->save();
 
 		if ($request->filled('userRoles')) {

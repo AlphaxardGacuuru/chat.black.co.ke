@@ -1,7 +1,11 @@
 import { useConnectionStatus } from "@laravel/echo-react"
 import { useRouterState } from "@tanstack/react-router"
 import { Breadcrumbs } from "@/components/breadcrumbs"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useSidebar } from "@/components/ui/sidebar"
+import VerifiedBadge from "@/components/verified-badge"
+import { useApp } from "@/contexts/AppContext"
+import { useInitials } from "@/hooks/use-initials"
 import { cn } from "@/lib/utils"
 import { useConversation } from "@/queries/chat"
 import type { BreadcrumbItem as BreadcrumbItemType } from "@/types"
@@ -44,6 +48,9 @@ export function AppSidebarHeader({
 				: null
 	const displayedBreadcrumbs = chatBreadcrumbs ?? breadcrumbs
 	const connectionStatus = useConnectionStatus()
+	const { auth } = useApp()
+	const { toggleSidebar } = useSidebar()
+	const getInitials = useInitials()
 
 	return (
 		<header
@@ -54,11 +61,8 @@ export function AppSidebarHeader({
 				variant === "floating" &&
 					"mx-2 mt-2 rounded-xl border border-white/40 bg-white/34 px-4 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-white/12 dark:bg-slate-950/20"
 			)}>
-			<div className="flex min-w-0 flex-1 items-center gap-2">
-				<SidebarTrigger className="-ml-1" />
-				<div className="min-w-0 flex-1">
-					<Breadcrumbs breadcrumbs={displayedBreadcrumbs} />
-				</div>
+			<div className="min-w-0 flex-1">
+				<Breadcrumbs breadcrumbs={displayedBreadcrumbs} />
 			</div>
 
 			<span
@@ -78,6 +82,25 @@ export function AppSidebarHeader({
 				/>
 				{connectionLabel(connectionStatus)}
 			</span>
+
+			<button
+				type="button"
+				onClick={toggleSidebar}
+				aria-label="Toggle sidebar"
+				className="relative -mr-1 flex size-7 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80">
+				<Avatar className="size-7">
+					<AvatarImage
+						src={auth?.avatar}
+						alt={auth?.name}
+					/>
+					<AvatarFallback className="text-xs">
+						{getInitials(auth?.name ?? "")}
+					</AvatarFallback>
+				</Avatar>
+				{auth?.verified && (
+					<VerifiedBadge className="absolute -right-0.5 -bottom-0.5 size-3" />
+				)}
+			</button>
 		</header>
 	)
 }

@@ -7,6 +7,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import VerifiedBadge from "@/components/verified-badge"
 import { cn } from "@/lib/utils"
 import toast from "@/lib/toast"
 import { useConversations, useForwardMessage } from "@/queries/chat"
@@ -37,7 +38,9 @@ export default function ForwardMessageDialog({
 		return (conversations ?? [])
 			.filter((conversation) => conversation.id !== excludeConversationId)
 			.filter((conversation) =>
-				query ? (conversation.otherUser?.name ?? "").toLowerCase().includes(query) : true
+				query
+					? (conversation.otherUser?.name ?? "").toLowerCase().includes(query)
+					: true
 			)
 	}, [conversations, excludeConversationId, search])
 
@@ -90,15 +93,22 @@ export default function ForwardMessageDialog({
 							className={cn(
 								"flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-muted disabled:opacity-50"
 							)}>
-							<Avatar className="size-9">
+							<Avatar className="size-9 shrink-0">
 								<AvatarImage
 									src={conversation.otherUser?.avatar ?? undefined}
 									alt={conversation.otherUser?.name}
 								/>
-								<AvatarFallback>{initials(conversation.otherUser?.name)}</AvatarFallback>
+								<AvatarFallback>
+									{initials(conversation.otherUser?.name)}
+								</AvatarFallback>
 							</Avatar>
-							<span className="truncate text-sm font-medium">
-								{conversation.otherUser?.name ?? "Unknown"}
+							<span className="flex min-w-0 items-center gap-1 text-sm font-medium">
+								<span className="min-w-0 truncate">
+									{conversation.otherUser?.name ?? "Unknown"}
+								</span>
+								{conversation.otherUser?.verified && (
+									<VerifiedBadge className="size-3.5 shrink-0" />
+								)}
 							</span>
 						</button>
 					))}

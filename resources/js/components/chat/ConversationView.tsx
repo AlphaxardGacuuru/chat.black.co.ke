@@ -5,6 +5,7 @@ import MessageBubble from "@/components/chat/MessageBubble"
 import MessageComposer from "@/components/chat/MessageComposer"
 import TypingIndicator from "@/components/chat/TypingIndicator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import VerifiedBadge from "@/components/verified-badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useApp } from "@/contexts/AppContext"
@@ -68,9 +69,14 @@ export default function ConversationView({
 	const lastWhisperAtRef = useRef(0)
 
 	const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null)
-	const [forwardingMessage, setForwardingMessage] = useState<ChatMessage | null>(null)
-	const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(new Set())
-	const deleteTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
+	const [forwardingMessage, setForwardingMessage] =
+		useState<ChatMessage | null>(null)
+	const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(
+		new Set()
+	)
+	const deleteTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+		new Map()
+	)
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null)
 	const composerRef = useRef<HTMLDivElement>(null)
@@ -240,19 +246,29 @@ export default function ConversationView({
 					</Button>
 				)}
 
-				<Avatar className="size-10">
+				<Avatar className="size-10 shrink-0">
 					<AvatarImage
 						src={otherUser?.avatar ?? undefined}
 						alt={otherUser?.name}
 					/>
 					<AvatarFallback>{initials(otherUser?.name)}</AvatarFallback>
-					{isOnline && (
-						<span className="absolute right-0 bottom-0 size-2.5 rounded-full bg-green-500 ring-2 ring-background" />
-					)}
 				</Avatar>
 
 				<div className="min-w-0 flex-1">
-					<p className="truncate font-medium">{otherUser?.name ?? "Unknown"}</p>
+					<p className="flex min-w-0 items-center gap-1 font-medium">
+						<span className="min-w-0 truncate">
+							{otherUser?.name ?? "Unknown"}
+						</span>
+						{otherUser?.verified && (
+							<VerifiedBadge className="size-3.5 shrink-0" />
+						)}
+						{isOnline && (
+							<span
+								className="size-2 shrink-0 rounded-full bg-primary"
+								aria-label="Online"
+							/>
+						)}
+					</p>
 					<p className="truncate text-xs text-muted-foreground">
 						{isOtherTyping
 							? "typing…"

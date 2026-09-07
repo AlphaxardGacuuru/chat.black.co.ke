@@ -3,6 +3,7 @@ export type ChatUser = {
 	name: string
 	email: string
 	avatar: string | null
+	verified: boolean
 	lastSeenAt: string | null
 }
 

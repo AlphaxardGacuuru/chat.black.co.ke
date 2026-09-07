@@ -1,4 +1,4 @@
-import { ChevronRight, LayoutDashboard, ShieldCheck } from "lucide-react"
+import { ChevronRight, LayoutDashboard, ShieldCheck, Users } from "lucide-react"
 import { Link } from "@/components/ui/link"
 import {
 	Collapsible,
@@ -18,6 +18,7 @@ import { useCurrentUrl } from "@/hooks/use-current-url"
 
 const ADMIN_ITEMS = [
 	{ title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+	{ title: "Users", href: "/admin/users", icon: Users },
 ]
 
 export function AdminNav() {

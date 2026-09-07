@@ -30,7 +30,8 @@ class NewChatMessageNotification extends Notification implements ShouldQueue
 
         return (new WebPushMessage)
             ->title($this->message->sender->name)
-            ->icon($this->message->sender->avatar ?? '/favicon.ico')
+            ->icon($this->message->sender->avatar ?? '/android-chrome-192x192.png')
+            ->badge('/android-chrome-192x192.png')
             ->body($this->body())
             // Group notifications per conversation so a burst of messages
             // replaces the previous banner instead of stacking indefinitely,

@@ -1,5 +1,6 @@
 import { Archive, Trash2 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import VerifiedBadge from "@/components/verified-badge"
 import { useConversationChannel } from "@/hooks/use-conversation-channel"
 import { useSwipeActions } from "@/hooks/use-swipe-actions"
 import toast from "@/lib/toast"
@@ -53,7 +54,9 @@ export default function ConversationListRow({
 		onSwipeRight: () => {
 			toggleArchive.mutate(conversation.id, {
 				onSuccess: ({ isArchived }) =>
-					toast.success(isArchived ? "Conversation archived" : "Conversation unarchived"),
+					toast.success(
+						isArchived ? "Conversation archived" : "Conversation unarchived"
+					),
 				onError: () => toast.error("Couldn't archive the conversation"),
 			})
 		},
@@ -95,19 +98,27 @@ export default function ConversationListRow({
 						alt={otherUser?.name}
 					/>
 					<AvatarFallback>{initials(otherUser?.name)}</AvatarFallback>
-					{isOnline && (
-						<span className="absolute right-0.5 bottom-0.5 z-10 size-3 rounded-full bg-green-500 ring-2 ring-card" />
-					)}
 				</Avatar>
 
 				<div className="min-w-0 flex-1">
 					<div className="flex items-center justify-between gap-2">
-						<span
-							className={cn(
-								"truncate",
-								unreadCount > 0 && "font-semibold text-primary"
-							)}>
-							{otherUser?.name ?? "Unknown"}
+						<span className="flex min-w-0 items-center gap-1">
+							<span
+								className={cn(
+									"truncate",
+									unreadCount > 0 && "font-semibold text-primary"
+								)}>
+								{otherUser?.name ?? "Unknown"}
+							</span>
+							{otherUser?.verified && (
+								<VerifiedBadge className="size-3.5 shrink-0" />
+							)}
+							{isOnline && (
+								<span
+									className="size-2 shrink-0 rounded-full bg-primary"
+									aria-label="Online"
+								/>
+							)}
 						</span>
 						<span className="shrink-0 text-xs text-muted-foreground">
 							{formatTime(lastMessageAt)}

@@ -7,6 +7,7 @@ use App\Http\Controllers\Chat\ChatAttachmentController;
 use App\Http\Controllers\Chat\ChatConversationController;
 use App\Http\Controllers\Chat\ChatMessageController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupportTicketController;
@@ -44,6 +45,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('push-subscriptions', [PushSubscriptionController::class, 'store']);
     Route::delete('push-subscriptions', [PushSubscriptionController::class, 'destroy']);
 
+    Route::post('onboarding/permissions', [OnboardingController::class, 'completePermissions']);
+
     Route::get('chat/conversations', [ChatConversationController::class, 'index']);
     Route::post('chat/conversations', [ChatConversationController::class, 'store']);
     Route::get('chat/conversations/{id}', [ChatConversationController::class, 'show']);
@@ -62,6 +65,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::patch('users/{id}/verify', [UserController::class, 'update'])->name('users.verify');
 });
 
 /*

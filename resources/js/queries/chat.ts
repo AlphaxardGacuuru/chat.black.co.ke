@@ -36,9 +36,9 @@ export function useStartConversation() {
 
 	return useMutation({
 		mutationFn: (userId: string) =>
-			Axios.post<{ data: ChatConversation }>("api/chat/conversations", { userId }).then(
-				(res) => res.data.data
-			),
+			Axios.post<{ data: ChatConversation }>("api/chat/conversations", {
+				userId,
+			}).then((res) => res.data.data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["chat", "conversations"] })
 		},
@@ -53,7 +53,8 @@ export function useSendMessage(conversationId: string) {
 			body?: string
 			temporaryUploadIds?: number[]
 			replyToId?: string
-		}) => Axios.post(`api/chat/conversations/${conversationId}/messages`, payload),
+		}) =>
+			Axios.post(`api/chat/conversations/${conversationId}/messages`, payload),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["chat", "conversations"] })
 			queryClient.invalidateQueries({
@@ -108,7 +109,8 @@ export function useDeleteMessage(conversationId: string) {
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: (messageId: string) => Axios.delete(`api/chat/messages/${messageId}`),
+		mutationFn: (messageId: string) =>
+			Axios.delete(`api/chat/messages/${messageId}`),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["chat", "conversation", conversationId],
@@ -122,9 +124,9 @@ export function useToggleStarMessage(conversationId: string) {
 
 	return useMutation({
 		mutationFn: (messageId: string) =>
-			Axios.post<{ isStarred: boolean }>(`api/chat/messages/${messageId}/star`).then(
-				(res) => res.data
-			),
+			Axios.post<{ isStarred: boolean }>(
+				`api/chat/messages/${messageId}/star`
+			).then((res) => res.data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["chat", "conversation", conversationId],
@@ -143,7 +145,8 @@ export function useForwardMessage() {
 		}: {
 			messageId: string
 			conversationId: string
-		}) => Axios.post(`api/chat/messages/${messageId}/forward`, { conversationId }),
+		}) =>
+			Axios.post(`api/chat/messages/${messageId}/forward`, { conversationId }),
 		onSuccess: (_data, { conversationId }) => {
 			queryClient.invalidateQueries({ queryKey: ["chat", "conversations"] })
 			queryClient.invalidateQueries({
@@ -158,6 +161,7 @@ export type ChatUserSearchResult = {
 	name: string
 	email: string
 	avatar: string | null
+	verified: boolean
 }
 
 export function useChatUsers(query: string) {

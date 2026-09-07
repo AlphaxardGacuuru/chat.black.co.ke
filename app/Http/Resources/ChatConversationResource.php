@@ -43,6 +43,7 @@ class ChatConversationResource extends JsonResource
                 'name' => $otherParticipant->name,
                 'email' => $otherParticipant->email,
                 'avatar' => $otherParticipant->avatar,
+                'verified' => (bool) $otherParticipant->verified,
                 'lastSeenAt' => $otherParticipant->last_seen_at,
             ] : null,
             'lastMessage' => $lastMessage ? [
