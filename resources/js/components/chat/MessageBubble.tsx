@@ -46,7 +46,11 @@ export default function MessageBubble({
 	})
 
 	return (
-		<div className={cn("group/bubble relative flex", isOwn ? "justify-end" : "justify-start")}>
+		<div
+			className={cn(
+				"group/bubble relative flex",
+				isOwn ? "justify-end" : "justify-start"
+			)}>
 			<div
 				className="pointer-events-none absolute inset-y-0 left-0 flex items-center text-primary transition-opacity"
 				style={{ opacity: Math.max(0, progress) }}>
@@ -72,8 +76,11 @@ export default function MessageBubble({
 					WebkitTouchCallout: "none",
 				}}
 				className={cn(
-					"relative max-w-[75%] touch-pan-y space-y-1 rounded-2xl py-2 text-sm shadow-sm select-none",
-					isOwn ? "pr-7 pl-3" : "pr-3 pl-7",
+					"relative max-w-[75%] touch-pan-y space-y-1 rounded-2xl px-3 py-2 text-sm shadow-sm select-none",
+					// Only reserved on md+: below that the trigger is invisible
+					// (long-press opens the menu instead, see the button below),
+					// so keeping the extra padding would just be dead space.
+					isOwn ? "md:pr-7" : "md:pl-7",
 					offsetX === 0 && "transition-transform duration-200 ease-out",
 					isOwn
 						? "rounded-br-sm bg-primary/50 text-primary-foreground"
@@ -92,7 +99,9 @@ export default function MessageBubble({
 					</div>
 				)}
 
-				{message.body && <p className="whitespace-pre-wrap break-words">{message.body}</p>}
+				{message.body && (
+					<p className="whitespace-pre-wrap break-words">{message.body}</p>
+				)}
 
 				{message.attachments.length > 0 && (
 					<div className="flex flex-wrap gap-2">
@@ -110,7 +119,9 @@ export default function MessageBubble({
 						"flex items-center justify-end gap-1 text-[11px]",
 						isOwn ? "text-primary-foreground/80" : "text-muted-foreground"
 					)}>
-					{message.isStarred && <Star className="size-3 fill-current text-amber-500" />}
+					{message.isStarred && (
+						<Star className="size-3 fill-current text-amber-500" />
+					)}
 					<span>{formatTime(message.createdAt)}</span>
 					{isOwn && (
 						<ChatStatusIcon
@@ -146,7 +157,9 @@ export default function MessageBubble({
 						<Reply /> Reply
 					</DropdownMenuItem>
 					<DropdownMenuItem onClick={() => onToggleStar(message)}>
-						<Star className={cn(message.isStarred && "fill-current text-amber-500")} />
+						<Star
+							className={cn(message.isStarred && "fill-current text-amber-500")}
+						/>
 						{message.isStarred ? "Unstar" : "Star"}
 					</DropdownMenuItem>
 					<DropdownMenuItem onClick={() => onForward(message)}>

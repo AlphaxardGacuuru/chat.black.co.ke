@@ -217,7 +217,7 @@ const MessageComposer = forwardRef<HTMLDivElement, Props>(
 							className="rounded-full p-6"
 							disabled={!canSend || sendMessage.isPending}
 							onClick={handleSend}>
-							<Send className="size-6" />
+							<Send className="size-6 rotate-315" />
 						</Button>
 					</div>
 				</div>

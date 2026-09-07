@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
-import { MessageSquarePlus } from "lucide-react"
+import { Feather } from "lucide-react"
 import ChatEmptyState from "@/components/chat/ChatEmptyState"
 import ConversationListRow from "@/components/chat/ConversationListRow"
 import { Button } from "@/components/ui/button"
@@ -124,7 +124,7 @@ export default function ConversationList({
 					title="New chat"
 					className="fixed right-4 bottom-[calc(6rem+1rem+env(safe-area-inset-bottom))] z-50 size-14 rounded-full shadow-lg md:absolute md:right-6 md:bottom-6"
 					onClick={() => navigate({ to: "/chats/new" })}>
-					<MessageSquarePlus
+					<Feather
 						className="size-6"
 						strokeWidth={1.5}
 					/>
