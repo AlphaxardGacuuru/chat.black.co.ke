@@ -15,9 +15,9 @@ class ChatConversationController extends Controller
 {
     public function __construct(protected ChatConversationService $service) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        [$status, $message, $conversations] = $this->service->index();
+        [$status, $message, $conversations] = $this->service->index($request->boolean('archived'));
 
         return ChatConversationResource::collection($conversations)
             ->additional([

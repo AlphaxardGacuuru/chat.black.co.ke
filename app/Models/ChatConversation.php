@@ -52,6 +52,15 @@ class ChatConversation extends Model
         );
     }
 
+    public function scopeArchivedBy(Builder $query, string $userId): Builder
+    {
+        return $query->whereHas(
+            'participants',
+            fn (Builder $q) => $q->where('users.id', $userId)
+                ->whereNotNull('chat_conversation_participants.archived_at')
+        );
+    }
+
     // "Deleting" a conversation sets a per-participant cutoff (deleted_at)
     // rather than a boolean hide: it clears everything up to that point from
     // that user's view, but isn't a dead end — once a message lands after the

@@ -1,5 +1,5 @@
 import { Link } from "@/components/ui/link"
-import { Download, MessageSquare } from "lucide-react"
+import { Archive, Download, MessageSquare } from "lucide-react"
 import { AdminNav } from "@/components/admin/AdminNav"
 import AppLogo from "@/components/app-logo"
 import { NavFooter } from "@/components/nav-footer"
@@ -29,6 +29,11 @@ export const mainNavItems: NavItem[] = [
 		title: "Chats",
 		href: "/chats",
 		icon: MessageSquare,
+	},
+	{
+		title: "Archived",
+		href: "/chats/archived",
+		icon: Archive,
 	},
 ]
 
@@ -61,7 +66,10 @@ export function AppSidebar() {
 								asChild>
 								<Link href={HOME_URL}>
 									{state === "collapsed" ? (
-										<AppLogo variant="icon" className="h-8" />
+										<AppLogo
+											variant="icon"
+											className="h-8"
+										/>
 									) : (
 										<AppLogo />
 									)}

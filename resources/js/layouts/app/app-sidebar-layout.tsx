@@ -18,15 +18,23 @@ export default function AppSidebarLayout({
 
 	return (
 		<AppShell variant="sidebar">
-			<AppSidebar />
 			<AppContent
 				variant="sidebar"
-				className={cn("bg-transparent md:pb-0", hideBottomNav ? "pb-0" : "pb-24")}>
+				className={cn(
+					"bg-transparent md:pb-0",
+					hideBottomNav ? "pb-0" : "pb-24"
+				)}>
 				{!hideSidebarHeader && (
-					<AppSidebarHeader breadcrumbs={breadcrumbs} variant="floating" />
+					<AppSidebarHeader
+						breadcrumbs={breadcrumbs}
+						variant="floating"
+					/>
 				)}
-				<div className="flex flex-1 flex-col gap-4 overflow-x-hidden p-4">{children}</div>
+				<div className="flex flex-1 flex-col gap-4 overflow-x-hidden p-4">
+					{children}
+				</div>
 			</AppContent>
+			<AppSidebar />
 			<AppBottomNav />
 		</AppShell>
 	)

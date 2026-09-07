@@ -191,8 +191,9 @@ const MessageComposer = forwardRef<HTMLDivElement, Props>(
 							size="icon"
 							aria-label="Attach files"
 							title="Attach files"
+							className="rounded-full p-6"
 							onClick={() => setShowAttachments((value) => !value)}>
-							<Paperclip className="size-5" />
+							<Paperclip className="size-6" />
 						</Button>
 
 						<textarea
@@ -204,7 +205,7 @@ const MessageComposer = forwardRef<HTMLDivElement, Props>(
 							onKeyDown={handleKeyDown}
 							placeholder="Type a message"
 							rows={1}
-							className="max-h-32 flex-1 resize-none rounded-full p-1 text-sm outline-none focus:bg-background"
+							className="max-h-32 flex-1 resize-none rounded-full p-3 text-sm outline-none focus:bg-background"
 						/>
 
 						<Button
@@ -212,10 +213,10 @@ const MessageComposer = forwardRef<HTMLDivElement, Props>(
 							size="icon"
 							aria-label="Send"
 							title="Send"
-							className="rounded-full"
+							className="rounded-full p-6"
 							disabled={!canSend || sendMessage.isPending}
 							onClick={handleSend}>
-							<Send className="size-4" />
+							<Send className="size-6" />
 						</Button>
 					</div>
 				</div>

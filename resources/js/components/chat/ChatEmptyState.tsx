@@ -1,14 +1,26 @@
-import { MessageCircle, MessagesSquare, SearchX } from "lucide-react"
+import { Archive, MessageCircle, MessagesSquare, SearchX } from "lucide-react"
 
 type Props = {
-	variant: "no-conversations" | "no-selection" | "search-no-results"
+	variant:
+		| "no-conversations"
+		| "no-archived-conversations"
+		| "no-selection"
+		| "search-no-results"
 }
 
-const CONTENT: Record<Props["variant"], { icon: typeof MessageCircle; title: string; description: string }> = {
+const CONTENT: Record<
+	Props["variant"],
+	{ icon: typeof MessageCircle; title: string; description: string }
+> = {
 	"no-conversations": {
 		icon: MessagesSquare,
 		title: "No conversations yet",
 		description: "Start a new chat to say hello.",
+	},
+	"no-archived-conversations": {
+		icon: Archive,
+		title: "No archived chats",
+		description: "Conversations you archive will show up here.",
 	},
 	"no-selection": {
 		icon: MessageCircle,

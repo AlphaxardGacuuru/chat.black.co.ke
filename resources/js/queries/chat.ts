@@ -10,13 +10,13 @@ type ConversationShowResponse = {
 	}
 }
 
-export function useConversations() {
+export function useConversations(archived = false) {
 	return useQuery({
-		queryKey: ["chat", "conversations"],
+		queryKey: ["chat", "conversations", archived],
 		queryFn: () =>
-			Axios.get<{ data: ChatConversation[] }>("api/chat/conversations").then(
-				(res) => res.data.data
-			),
+			Axios.get<{ data: ChatConversation[] }>("api/chat/conversations", {
+				params: { archived },
+			}).then((res) => res.data.data),
 	})
 }
 

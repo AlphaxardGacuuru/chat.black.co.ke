@@ -13,15 +13,24 @@ const UNDO_REMOVE_WINDOW_MS = 5000
 type Props = {
 	selectedId: string | null
 	onSelect: (id: string) => void
+	archived?: boolean
 }
 
-export default function ConversationList({ selectedId, onSelect }: Props) {
-	const { data: conversations, isLoading } = useConversations()
+export default function ConversationList({
+	selectedId,
+	onSelect,
+	archived = false,
+}: Props) {
+	const { data: conversations, isLoading } = useConversations(archived)
 	const navigate = useNavigate()
 	const removeConversation = useRemoveConversation()
 
-	const [pendingRemoveIds, setPendingRemoveIds] = useState<Set<string>>(new Set())
-	const removeTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
+	const [pendingRemoveIds, setPendingRemoveIds] = useState<Set<string>>(
+		new Set()
+	)
+	const removeTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+		new Map()
+	)
 
 	useEffect(() => {
 		const timers = removeTimersRef.current
@@ -88,7 +97,11 @@ export default function ConversationList({ selectedId, onSelect }: Props) {
 				)}
 
 				{!isLoading && visibleConversations.length === 0 && (
-					<ChatEmptyState variant="no-conversations" />
+					<ChatEmptyState
+						variant={
+							archived ? "no-archived-conversations" : "no-conversations"
+						}
+					/>
 				)}
 
 				{!isLoading &&
@@ -103,14 +116,19 @@ export default function ConversationList({ selectedId, onSelect }: Props) {
 					))}
 			</div>
 
-			<Button
-				size="icon"
-				aria-label="New chat"
-				title="New chat"
-				className="fixed right-4 bottom-[calc(6rem+1rem+env(safe-area-inset-bottom))] z-50 size-14 rounded-full shadow-lg md:absolute md:right-6 md:bottom-6"
-				onClick={() => navigate({ to: "/chats/new" })}>
-				<Plus className="size-6" strokeWidth={1.5} />
-			</Button>
+			{!archived && (
+				<Button
+					size="icon"
+					aria-label="New chat"
+					title="New chat"
+					className="fixed right-4 bottom-[calc(6rem+1rem+env(safe-area-inset-bottom))] z-50 size-14 rounded-full shadow-lg md:absolute md:right-6 md:bottom-6"
+					onClick={() => navigate({ to: "/chats/new" })}>
+					<Plus
+						className="size-6"
+						strokeWidth={1.5}
+					/>
+				</Button>
+			)}
 		</div>
 	)
 }

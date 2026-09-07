@@ -234,7 +234,7 @@ export default function ConversationView({
 		<div className="relative flex flex-1 flex-col overflow-hidden">
 			<div
 				className={cn(
-					"sticky top-0 z-30 flex items-center gap-2 p-3",
+					"sticky top-0 z-30 flex items-center gap-2 p-3 lg:m-3",
 					"rounded-xl border border-white/40 bg-white/34 px-4 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-white/12 dark:bg-slate-950/20"
 				)}>
 				{variant === "page" && (
@@ -283,7 +283,7 @@ export default function ConversationView({
 
 			<div
 				ref={messagesContainerRef}
-				className="min-h-0 flex-1 space-y-2 overflow-y-auto py-3"
+				className="min-h-0 flex-1 space-y-2 overflow-y-auto py-3 lg:mx-3"
 				style={{ paddingBottom: composerHeight + 16 }}>
 				{messages
 					.filter((message) => !pendingDeleteIds.has(message.id))

@@ -9,12 +9,16 @@ use Illuminate\Support\Facades\DB;
 
 class ChatConversationService extends Service
 {
-    public function index(): array
+    public function index(bool $archived = false): array
     {
         $this->touchLastSeen();
 
         $conversations = ChatConversation::forUser($this->id)
-            ->notArchivedBy($this->id)
+            ->when(
+                $archived,
+                fn($query) => $query->archivedBy($this->id),
+                fn($query) => $query->notArchivedBy($this->id)
+            )
             ->notDeletedBy($this->id)
             ->with([
                 'participants',
