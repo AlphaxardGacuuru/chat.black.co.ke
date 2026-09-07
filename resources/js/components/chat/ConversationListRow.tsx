@@ -1,4 +1,4 @@
-import { Archive, Trash2 } from "lucide-react"
+import { Archive, ArchiveRestore, Trash2 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import VerifiedBadge from "@/components/verified-badge"
 import { useConversationChannel } from "@/hooks/use-conversation-channel"
@@ -35,6 +35,7 @@ type Props = {
 	isSelected: boolean
 	onSelect: () => void
 	onRemove: () => void
+	archived?: boolean
 }
 
 export default function ConversationListRow({
@@ -42,6 +43,7 @@ export default function ConversationListRow({
 	isSelected,
 	onSelect,
 	onRemove,
+	archived = false,
 }: Props) {
 	const { otherUser, lastMessage, unreadCount, lastMessageAt } = conversation
 
@@ -63,12 +65,14 @@ export default function ConversationListRow({
 		onSwipeLeft: onRemove,
 	})
 
+	const SwipeRightIcon = archived ? ArchiveRestore : Archive
+
 	return (
 		<div className="relative">
 			<div
 				className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-emerald-600 transition-opacity"
 				style={{ opacity: Math.max(0, progress) }}>
-				<Archive className="size-5" />
+				<SwipeRightIcon className="size-5" />
 			</div>
 			<div
 				className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-destructive transition-opacity"

@@ -37,6 +37,29 @@ export const mainNavItems: NavItem[] = [
 	},
 ]
 
+// Sibling routes like /chats and /chats/archived both start with "/chats",
+// so a plain prefix match would leave both nav items active on the archived
+// page. Picking the longest matching href resolves the ambiguity in favor
+// of the more specific route, and generalizes to any future nav items with
+// overlapping prefixes.
+export function findActiveNavHref(
+	pathname: string,
+	items: NavItem[]
+): string | null {
+	let best: string | null = null
+
+	for (const item of items) {
+		const href = toUrl(item.href)
+		const matches = pathname === href || pathname.startsWith(`${href}/`)
+
+		if (matches && (best === null || href.length > best.length)) {
+			best = href
+		}
+	}
+
+	return best
+}
+
 const footerNavItems: NavItem[] = [
 	{
 		title: "Get App",
@@ -49,8 +72,9 @@ export function AppSidebar() {
 	const { state } = useSidebar()
 	const { isInstalled } = usePwaInstall()
 	const { auth } = useApp()
-	const { isCurrentUrl } = useCurrentUrl()
+	const { currentUrl } = useCurrentUrl()
 	const isAdmin = auth?.email === ADMIN_EMAIL
+	const activeMainNavHref = findActiveNavHref(currentUrl, mainNavItems)
 
 	return (
 		<Sidebar
@@ -87,7 +111,7 @@ export function AppSidebar() {
 							<SidebarMenuItem key={item.title}>
 								<SidebarMenuButton
 									asChild
-									isActive={isCurrentUrl(item.href)}
+									isActive={toUrl(item.href) === activeMainNavHref}
 									tooltip={item.title}>
 									<Link href={toUrl(item.href)}>
 										{item.icon && <item.icon />}
