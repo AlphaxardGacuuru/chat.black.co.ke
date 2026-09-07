@@ -51,12 +51,14 @@ type Props = {
 	conversationId: string
 	variant: "pane" | "page"
 	onBack?: () => void
+	initialBody?: string
 }
 
 export default function ConversationView({
 	conversationId,
 	variant,
 	onBack,
+	initialBody,
 }: Props) {
 	const { auth } = useApp()
 	const { data, isLoading } = useConversation(conversationId)
@@ -310,6 +312,7 @@ export default function ConversationView({
 				onTyping={sendTypingWhisper}
 				replyingTo={replyingTo}
 				onCancelReply={() => setReplyingTo(null)}
+				initialBody={initialBody}
 			/>
 
 			<ForwardMessageDialog

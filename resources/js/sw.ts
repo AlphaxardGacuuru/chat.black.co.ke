@@ -152,6 +152,10 @@ registerRoute(
 
 // ─── Web push notifications ───────────────────────────────────────────────────
 
+type PushAction = { action: string; title: string }
+
+type PushNotificationData = { url?: string; conversationId?: string }
+
 type PushPayload = {
 	title?: string
 	body?: string
@@ -159,7 +163,8 @@ type PushPayload = {
 	badge?: string
 	tag?: string
 	renotify?: boolean
-	data?: { url?: string }
+	actions?: PushAction[]
+	data?: PushNotificationData
 }
 
 self.addEventListener("push", (event) => {
@@ -169,15 +174,19 @@ self.addEventListener("push", (event) => {
 
 	const payload: PushPayload = event.data.json()
 
-	// `renotify` is a real, supported NotificationOptions field that's
-	// missing from TypeScript's bundled DOM lib — widen the type locally
-	// instead of casting away the rest of the options' type-checking.
-	const options: NotificationOptions & { renotify?: boolean } = {
+	// `renotify` and `actions` are real, supported NotificationOptions
+	// fields missing from TypeScript's bundled DOM lib — widen the type
+	// locally instead of casting away the rest of the options' checking.
+	const options: NotificationOptions & {
+		renotify?: boolean
+		actions?: PushAction[]
+	} = {
 		body: payload.body,
-		icon: payload.icon ?? "/android-chrome-192x192.png",
-		badge: payload.badge ?? "/android-chrome-192x192.png",
+		icon: payload.icon ?? "/notification-badge-192x192.png",
+		badge: payload.badge ?? "/notification-badge-192x192.png",
 		tag: payload.tag,
 		renotify: payload.renotify,
+		actions: payload.actions,
 		data: payload.data,
 	}
 
@@ -189,29 +198,97 @@ self.addEventListener("push", (event) => {
 	)
 })
 
+// Opens the conversation (or focuses it if already open in some tab) —
+// the fallback for a plain click, or a reply that couldn't be sent directly
+// from the service worker. `draft` prefills the message composer so a typed
+// reply is never silently lost.
+function openConversation(url: string, draft?: string) {
+	const targetUrl = draft ? `${url}?draft=${encodeURIComponent(draft)}` : url
+
+	return self.clients
+		.matchAll({ type: "window", includeUncontrolled: true })
+		.then((clients) => {
+			const targetPath = new URL(url, self.location.origin).pathname
+			const existing = clients.find(
+				(client) => new URL(client.url).pathname === targetPath
+			)
+
+			if (existing) {
+				return existing.focus()
+			}
+
+			return self.clients.openWindow(
+				new URL(targetUrl, self.location.origin).href
+			)
+		})
+}
+
+// A same-origin request carrying whatever session cookie the browser has —
+// there's no way for a service worker to reach the bearer token an already
+// open tab keeps in localStorage, so this only actually authenticates for
+// users signed in via the session-cookie login path. It fails silently for
+// everyone else, same as if the action wasn't offered at all.
+function apiFetch(path: string, method: string, body?: unknown) {
+	return fetch(path, {
+		method,
+		credentials: "include",
+		headers: {
+			Accept: "application/json",
+			"X-Requested-With": "XMLHttpRequest",
+			...(body ? { "Content-Type": "application/json" } : {}),
+		},
+		body: body ? JSON.stringify(body) : undefined,
+	}).then((response) => {
+		if (!response.ok) {
+			throw new Error(`Request to ${path} failed with ${response.status}`)
+		}
+	})
+}
+
 self.addEventListener("notificationclick", (event) => {
 	event.notification.close()
 
-	const url = (event.notification.data as { url?: string } | undefined)?.url
+	const data = event.notification.data as PushNotificationData | undefined
+	const conversationId = data?.conversationId
 
-	if (!url) {
+	if (!data?.url || !conversationId) {
 		return
 	}
 
-	event.waitUntil(
-		self.clients
-			.matchAll({ type: "window", includeUncontrolled: true })
-			.then((clients) => {
-				const target = new URL(url, self.location.origin).href
-				const existing = clients.find((client) => client.url === target)
+	const action = event.action
+	// Inline reply text, typed straight into the notification — only
+	// supported by a handful of browsers (mainly desktop Chrome/Edge) and
+	// not yet part of TypeScript's NotificationEvent type.
+	const reply = (event as unknown as { reply?: string }).reply
 
-				if (existing) {
-					return existing.focus()
-				}
+	if (action === "mark-read") {
+		event.waitUntil(
+			apiFetch(`/api/chat/conversations/${conversationId}/read`, "POST").catch(
+				() => {}
+			)
+		)
+		return
+	}
 
-				return self.clients.openWindow(target)
-			})
-	)
+	if (action === "delete") {
+		event.waitUntil(
+			apiFetch(`/api/chat/conversations/${conversationId}`, "DELETE").catch(
+				() => {}
+			)
+		)
+		return
+	}
+
+	if (action === "reply" && reply) {
+		event.waitUntil(
+			apiFetch(`/api/chat/conversations/${conversationId}/messages`, "POST", {
+				body: reply,
+			}).catch(() => openConversation(data.url!, reply))
+		)
+		return
+	}
+
+	event.waitUntil(openConversation(data.url))
 })
 
 // ─── SPA navigation fallback ──────────────────────────────────────────────────

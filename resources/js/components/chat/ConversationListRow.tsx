@@ -120,7 +120,13 @@ export default function ConversationListRow({
 								/>
 							)}
 						</span>
-						<span className="shrink-0 text-xs text-muted-foreground">
+						<span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+							{conversation.isArchived && (
+								<Archive
+									className="size-3"
+									aria-label="Archived"
+								/>
+							)}
 							{formatTime(lastMessageAt)}
 						</span>
 					</div>

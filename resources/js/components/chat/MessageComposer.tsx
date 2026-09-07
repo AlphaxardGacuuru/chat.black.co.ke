@@ -21,14 +21,15 @@ type Props = {
 	onTyping?: () => void
 	replyingTo?: ChatMessage | null
 	onCancelReply?: () => void
+	initialBody?: string
 }
 
 const MessageComposer = forwardRef<HTMLDivElement, Props>(
 	function MessageComposer(
-		{ conversationId, onTyping, replyingTo, onCancelReply },
+		{ conversationId, onTyping, replyingTo, onCancelReply, initialBody },
 		ref
 	) {
-		const [body, setBody] = useState("")
+		const [body, setBody] = useState(initialBody ?? "")
 		const [attachmentIds, setAttachmentIds] = useState<Record<string, number>>(
 			{}
 		)
