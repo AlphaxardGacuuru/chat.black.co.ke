@@ -17,8 +17,8 @@ export function AppShell({ children, variant = "sidebar" }: Props) {
 
 	const backdropLines = (
 		<div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-			<div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,rgba(15,23,42,0.1)_0_1px,transparent_1px_12px)] opacity-[0.5] dark:bg-[repeating-linear-gradient(45deg,rgba(248,250,252,0.18)_0_1px,transparent_1px_12px)] dark:opacity-[0.16]" />
-			<div className="absolute inset-0 bg-[repeating-linear-gradient(135deg,rgba(15,23,42,0.1)_0_1px,transparent_1px_12px)] opacity-[0.5] dark:bg-[repeating-linear-gradient(135deg,rgba(248,250,252,0.18)_0_1px,transparent_1px_12px)] dark:opacity-[0.16]" />
+			<div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,color-mix(in_oklch,var(--primary)_10%,transparent)_0_1px,transparent_1px_12px)] opacity-[0.5] dark:bg-[repeating-linear-gradient(45deg,color-mix(in_oklch,var(--primary)_18%,transparent)_0_1px,transparent_1px_12px)] dark:opacity-[0.16]" />
+			<div className="absolute inset-0 bg-[repeating-linear-gradient(135deg,color-mix(in_oklch,var(--primary)_10%,transparent)_0_1px,transparent_1px_12px)] opacity-[0.5] dark:bg-[repeating-linear-gradient(135deg,color-mix(in_oklch,var(--primary)_18%,transparent)_0_1px,transparent_1px_12px)] dark:opacity-[0.16]" />
 		</div>
 	)
 

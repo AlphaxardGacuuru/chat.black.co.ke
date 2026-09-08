@@ -43,9 +43,14 @@ export function AppSidebarHeader({
 					{ title: "Chats", href: "/chats" },
 					{ title: "New chat", href: pathname },
 				]
-			: pathname === "/chats" || pathname === "/chats/"
-				? [{ title: "Chats", href: pathname }]
-				: null
+			: pathname === "/chats/archived"
+				? [
+						// { title: "Chats", href: "/chats" },
+						{ title: "Archived", href: pathname },
+					]
+				: pathname === "/chats" || pathname === "/chats/"
+					? [{ title: "Chats", href: pathname }]
+					: null
 	const displayedBreadcrumbs = chatBreadcrumbs ?? breadcrumbs
 	const connectionStatus = useConnectionStatus()
 	const { auth } = useApp()
@@ -69,14 +74,14 @@ export function AppSidebarHeader({
 				className={cn(
 					"inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
 					connectionStatus === "connected"
-						? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400"
+						? "border-primary/30 bg-primary/10 text-primary dark:text-primary"
 						: "border-muted-foreground/20 bg-muted text-muted-foreground"
 				)}>
 				<span
 					className={cn(
 						"size-1.5 rounded-full",
 						connectionStatus === "connected"
-							? "bg-green-500"
+							? "bg-primary"
 							: "bg-muted-foreground/50"
 					)}
 				/>

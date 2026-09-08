@@ -72,6 +72,36 @@ export function useToggleArchiveConversation() {
 			Axios.post<{ isArchived: boolean }>(
 				`api/chat/conversations/${conversationId}/archive`
 			).then((res) => res.data),
+		onMutate: async (conversationId) => {
+			await queryClient.cancelQueries({ queryKey: ["chat", "conversations"] })
+
+			// Whichever list this conversation is currently showing in
+			// (archived or not), drop it immediately rather than waiting on
+			// the request — it belongs in the other list now.
+			const previous = queryClient.getQueriesData<ChatConversation[]>({
+				queryKey: ["chat", "conversations"],
+			})
+
+			previous.forEach(([queryKey, conversations]) => {
+				if (!conversations) {
+					return
+				}
+
+				queryClient.setQueryData(
+					queryKey,
+					conversations.filter(
+						(conversation) => conversation.id !== conversationId
+					)
+				)
+			})
+
+			return { previous }
+		},
+		onError: (_error, _conversationId, context) => {
+			context?.previous.forEach(([queryKey, conversations]) => {
+				queryClient.setQueryData(queryKey, conversations)
+			})
+		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["chat", "conversations"] })
 		},

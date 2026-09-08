@@ -84,7 +84,7 @@ export default function MessageBubble({
 					offsetX === 0 && "transition-transform duration-200 ease-out",
 					isOwn
 						? "rounded-br-sm bg-primary/50 text-primary-foreground"
-						: "rounded-bl-sm bg-muted text-foreground"
+						: "rounded-bl-sm bg-secondary/50 text-foreground"
 				)}>
 				{message.replyTo && (
 					<div
@@ -100,7 +100,7 @@ export default function MessageBubble({
 				)}
 
 				{message.body && (
-					<p className="whitespace-pre-wrap break-words">{message.body}</p>
+					<p className="whitespace-pre-wrap wrap-break-word">{message.body}</p>
 				)}
 
 				{message.attachments.length > 0 && (

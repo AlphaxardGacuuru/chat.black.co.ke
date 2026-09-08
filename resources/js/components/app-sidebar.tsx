@@ -1,5 +1,5 @@
 import { Link } from "@/components/ui/link"
-import { Archive, Download, MessageSquare } from "lucide-react"
+import { Archive, Download, MessageSquareMore } from "lucide-react"
 import { AdminNav } from "@/components/admin/AdminNav"
 import AppLogo from "@/components/app-logo"
 import { NavFooter } from "@/components/nav-footer"
@@ -28,7 +28,7 @@ export const mainNavItems: NavItem[] = [
 	{
 		title: "Chats",
 		href: "/chats",
-		icon: MessageSquare,
+		icon: MessageSquareMore,
 	},
 	{
 		title: "Archived",
