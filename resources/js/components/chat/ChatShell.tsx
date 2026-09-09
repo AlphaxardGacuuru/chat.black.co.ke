@@ -4,14 +4,23 @@ import ChatEmptyState from "@/components/chat/ChatEmptyState"
 import ConversationList from "@/components/chat/ConversationList"
 import ConversationView from "@/components/chat/ConversationView"
 import { useIsMobile } from "@/hooks/use-mobile"
+import type { ChatConversation } from "@/types/chat"
 
 type ChatPane = { type: "none" } | { type: "conversation"; id: string }
 
 type Props = {
 	initialConversationId?: string
+	archived?: boolean
+	conversations?: ChatConversation[]
+	isLoading?: boolean
 }
 
-export default function ChatShell({ initialConversationId }: Props) {
+export default function ChatShell({
+	initialConversationId,
+	archived = false,
+	conversations = [],
+	isLoading = false,
+}: Props) {
 	const isMobile = useIsMobile()
 	const navigate = useNavigate()
 	const [pane, setPane] = useState<ChatPane>(
@@ -34,6 +43,9 @@ export default function ChatShell({ initialConversationId }: Props) {
 				<ConversationList
 					selectedId={null}
 					onSelect={handleSelect}
+					archived={archived}
+					conversations={conversations}
+					isLoading={isLoading}
 				/>
 			</div>
 		)
@@ -45,6 +57,9 @@ export default function ChatShell({ initialConversationId }: Props) {
 				<ConversationList
 					selectedId={pane.type === "conversation" ? pane.id : null}
 					onSelect={handleSelect}
+					archived={archived}
+					conversations={conversations}
+					isLoading={isLoading}
 				/>
 			</section>
 

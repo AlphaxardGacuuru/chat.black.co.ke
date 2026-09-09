@@ -6,7 +6,8 @@ import ConversationListRow from "@/components/chat/ConversationListRow"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import toast from "@/lib/toast"
-import { useConversations, useRemoveConversation } from "@/queries/chat"
+import { useRemoveConversation } from "@/queries/chat"
+import type { ChatConversation } from "@/types/chat"
 
 const UNDO_REMOVE_WINDOW_MS = 5000
 
@@ -14,14 +15,17 @@ type Props = {
 	selectedId: string | null
 	onSelect: (id: string) => void
 	archived?: boolean
+	conversations?: ChatConversation[]
+	isLoading?: boolean
 }
 
 export default function ConversationList({
 	selectedId,
 	onSelect,
 	archived = false,
+	conversations = [],
+	isLoading = false,
 }: Props) {
-	const { data: conversations, isLoading } = useConversations(archived)
 	const navigate = useNavigate()
 	const removeConversation = useRemoveConversation()
 
