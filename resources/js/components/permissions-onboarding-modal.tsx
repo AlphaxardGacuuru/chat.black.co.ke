@@ -16,6 +16,8 @@ import { usePushNotifications } from "@/hooks/use-push-notifications"
 import Axios from "@/lib/axios"
 import toast from "@/lib/toast"
 
+let hasPromptedForNotificationsThisVisit = false
+
 export default function PermissionsOnboardingModal() {
 	const { auth } = useApp()
 	const queryClient = useQueryClient()
@@ -39,7 +41,7 @@ export default function PermissionsOnboardingModal() {
 	}
 
 	useEffect(() => {
-		if (!auth || onboardedAt) {
+		if (!auth || onboardedAt || hasPromptedForNotificationsThisVisit) {
 			return
 		}
 
@@ -55,6 +57,7 @@ export default function PermissionsOnboardingModal() {
 			return
 		}
 
+		hasPromptedForNotificationsThisVisit = true
 		setOpen(true)
 	}, [auth, onboardedAt, isSupported, permission])
 
@@ -80,6 +83,7 @@ export default function PermissionsOnboardingModal() {
 			}
 		} finally {
 			setProcessing(false)
+			setOpen(false)
 		}
 	}
 
