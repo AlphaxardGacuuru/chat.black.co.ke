@@ -4,6 +4,8 @@ import { AppContent } from "@/components/app-content"
 import { AppShell } from "@/components/app-shell"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AppSidebarHeader } from "@/components/app-sidebar-header"
+import { NoInternet } from "@/components/no-internet"
+import { useOnline } from "@/hooks/use-online"
 import { isConversationShowRoute, shouldHideBottomNav } from "@/lib/bottom-nav"
 import { cn } from "@/lib/utils"
 import type { AppLayoutProps } from "@/types"
@@ -13,6 +15,7 @@ export default function AppSidebarLayout({
 	breadcrumbs = [],
 }: AppLayoutProps) {
 	const { pathname } = useLocation()
+	const isOnline = useOnline()
 	const hideBottomNav = shouldHideBottomNav(pathname)
 	const hideSidebarHeader = isConversationShowRoute(pathname)
 
@@ -31,7 +34,7 @@ export default function AppSidebarLayout({
 					/>
 				)}
 				<div className="flex flex-1 flex-col gap-4 overflow-x-hidden p-4">
-					{children}
+					{isOnline ? children : <NoInternet />}
 				</div>
 			</AppContent>
 			<AppSidebar />
