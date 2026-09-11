@@ -2,6 +2,7 @@ import { useApp } from "@/contexts/AppContext"
 import type { ReactNode } from "react"
 import { FloatingUserAvatar } from "@/components/floating-user-avatar"
 import PermissionsOnboardingModal from "@/components/permissions-onboarding-modal"
+import PwaInstallModal from "@/components/pwa-install-modal"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import type { AppVariant } from "@/types"
 
@@ -29,6 +30,7 @@ export function AppShell({ children, variant = "sidebar" }: Props) {
 				{children}
 				{shouldRenderFloatingAvatar && <FloatingUserAvatar />}
 				{auth && <PermissionsOnboardingModal />}
+				{auth && <PwaInstallModal />}
 			</div>
 		)
 	}
@@ -41,6 +43,7 @@ export function AppShell({ children, variant = "sidebar" }: Props) {
 				{/* {shouldRenderFloatingAvatar && <FloatingUserAvatar />} */}
 			</SidebarProvider>
 			{auth && <PermissionsOnboardingModal />}
+			{auth && <PwaInstallModal />}
 		</div>
 	)
 }
