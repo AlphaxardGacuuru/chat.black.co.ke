@@ -11,10 +11,17 @@ import {
 } from "@/components/ui/dialog"
 import { Spinner } from "@/components/ui/spinner"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { markPwaInstallStepResolved } from "@/hooks/use-onboarding-sequence"
 import { usePwaInstall } from "@/hooks/use-pwa-install"
 import toast from "@/lib/toast"
 
 let hasPromptedForPwaInstallThisVisit = false
+
+// How long to give the browser to fire `beforeinstallprompt` before treating
+// this step as resolved — it never fires at all on browsers that don't
+// support installability (e.g. iOS Safari), and the notifications step is
+// waiting on this one to avoid showing both dialogs at once.
+const INSTALL_PROMPT_GRACE_MS = 2000
 
 export default function PwaInstallModal() {
 	const isMobile = useIsMobile()
@@ -24,12 +31,30 @@ export default function PwaInstallModal() {
 	const [processing, setProcessing] = useState(false)
 
 	useEffect(() => {
-		if (hasPromptedForPwaInstallThisVisit || isInstalled || !isMobile || !canInstall) {
+		if (hasPromptedForPwaInstallThisVisit) {
 			return
 		}
 
-		hasPromptedForPwaInstallThisVisit = true
-		setOpen(true)
+		if (isInstalled || !isMobile) {
+			hasPromptedForPwaInstallThisVisit = true
+			markPwaInstallStepResolved()
+			return
+		}
+
+		if (canInstall) {
+			hasPromptedForPwaInstallThisVisit = true
+			setOpen(true)
+			return
+		}
+
+		const timeout = setTimeout(() => {
+			if (!hasPromptedForPwaInstallThisVisit) {
+				hasPromptedForPwaInstallThisVisit = true
+				markPwaInstallStepResolved()
+			}
+		}, INSTALL_PROMPT_GRACE_MS)
+
+		return () => clearTimeout(timeout)
 	}, [isMobile, canInstall, isInstalled])
 
 	async function handleInstall() {
@@ -46,11 +71,13 @@ export default function PwaInstallModal() {
 		} finally {
 			setProcessing(false)
 			setOpen(false)
+			markPwaInstallStepResolved()
 		}
 	}
 
 	function handleSkip() {
 		setOpen(false)
+		markPwaInstallStepResolved()
 	}
 
 	return (

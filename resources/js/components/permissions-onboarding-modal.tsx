@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Spinner } from "@/components/ui/spinner"
 import { useApp } from "@/contexts/AppContext"
+import { usePwaInstallStepResolved } from "@/hooks/use-onboarding-sequence"
 import { usePushNotifications } from "@/hooks/use-push-notifications"
 import Axios from "@/lib/axios"
 import toast from "@/lib/toast"
@@ -22,6 +23,7 @@ export default function PermissionsOnboardingModal() {
 	const { auth } = useApp()
 	const queryClient = useQueryClient()
 	const { isSupported, permission, subscribe } = usePushNotifications()
+	const pwaInstallStepResolved = usePwaInstallStepResolved()
 
 	const [open, setOpen] = useState(false)
 	const [processing, setProcessing] = useState(false)
@@ -41,7 +43,12 @@ export default function PermissionsOnboardingModal() {
 	}
 
 	useEffect(() => {
-		if (!auth || onboardedAt || hasPromptedForNotificationsThisVisit) {
+		if (
+			!auth ||
+			onboardedAt ||
+			hasPromptedForNotificationsThisVisit ||
+			!pwaInstallStepResolved
+		) {
 			return
 		}
 
@@ -59,7 +66,7 @@ export default function PermissionsOnboardingModal() {
 
 		hasPromptedForNotificationsThisVisit = true
 		setOpen(true)
-	}, [auth, onboardedAt, isSupported, permission])
+	}, [auth, onboardedAt, isSupported, permission, pwaInstallStepResolved])
 
 	async function handleEnable() {
 		setProcessing(true)
