@@ -5,6 +5,7 @@ import { Paperclip, Send, X } from "lucide-react"
 import { forwardRef, useRef, useState } from "react"
 import type { KeyboardEvent } from "react"
 import { FilePond, registerPlugin } from "react-filepond"
+import { useQueryClient } from "@tanstack/react-query"
 import FilePondController from "@/actions/App/Http/Controllers/FilePondController"
 import { Button } from "@/components/ui/button"
 import Axios from "@/lib/axios"
@@ -37,6 +38,7 @@ const MessageComposer = forwardRef<HTMLDivElement, Props>(
 		const [showAttachments, setShowAttachments] = useState(false)
 		const pondRef = useRef<FilePond>(null)
 		const sendMessage = useSendMessage(conversationId)
+		const queryClient = useQueryClient()
 
 		const isUploading = pendingUploads > 0
 		const canSend =
@@ -65,6 +67,9 @@ const MessageComposer = forwardRef<HTMLDivElement, Props>(
 					onSuccess: () => {
 						resetForm()
 						onCancelReply?.()
+						queryClient.refetchQueries({
+							queryKey: ["chat", "conversation", conversationId],
+						})
 					},
 					onError: () => toast.error("Couldn't send the message"),
 				}
