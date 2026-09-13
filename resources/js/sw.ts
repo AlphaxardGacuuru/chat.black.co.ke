@@ -1,14 +1,15 @@
 /// <reference lib="webworker" />
 import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching"
 import { registerRoute } from "workbox-routing"
-import {
-	CacheFirst,
-	NetworkFirst,
-	NetworkOnly,
-	StaleWhileRevalidate,
-} from "workbox-strategies"
+import { NetworkFirst, NetworkOnly } from "workbox-strategies"
 import { ExpirationPlugin } from "workbox-expiration"
 import { BackgroundSyncPlugin } from "workbox-background-sync"
+
+// Every runtime-cached route below always tries the network first and only
+// falls back to the cache when there's no connectivity — a slow-but-live
+// response always wins over a fast-but-stale one. `networkTimeoutSeconds`
+// keeps a flaky connection from hanging indefinitely before falling back.
+const NETWORK_TIMEOUT_SECONDS = 4
 
 declare const self: ServiceWorkerGlobalScope
 
@@ -22,12 +23,14 @@ self.addEventListener("activate", () => self.clients.claim())
 
 // ─── Caching strategies ───────────────────────────────────────────────────────
 
-// Static assets from the Vite build: cache-first, valid for 30 days.
+// Static assets from the Vite build: network-first, falling back to the
+// 30-day cache only when offline.
 registerRoute(
 	({ url }) =>
 		url.origin === self.location.origin && url.pathname.startsWith("/build/"),
-	new CacheFirst({
+	new NetworkFirst({
 		cacheName: "build-assets",
+		networkTimeoutSeconds: NETWORK_TIMEOUT_SECONDS,
 		plugins: [
 			new ExpirationPlugin({
 				maxEntries: 120,
@@ -37,13 +40,15 @@ registerRoute(
 	})
 )
 
-// Favicons and PWA icons: cache-first, valid for 30 days.
+// Favicons and PWA icons: network-first, falling back to the 30-day cache
+// only when offline.
 registerRoute(
 	({ url }) =>
 		url.origin === self.location.origin &&
 		/\.(png|ico|svg)$/.test(url.pathname),
-	new CacheFirst({
+	new NetworkFirst({
 		cacheName: "static-icons",
+		networkTimeoutSeconds: NETWORK_TIMEOUT_SECONDS,
 		plugins: [
 			new ExpirationPlugin({
 				maxEntries: 20,
@@ -62,6 +67,7 @@ registerRoute(
 		url.pathname.endsWith(".webmanifest"),
 	new NetworkFirst({
 		cacheName: "webmanifest",
+		networkTimeoutSeconds: NETWORK_TIMEOUT_SECONDS,
 		plugins: [
 			new ExpirationPlugin({
 				maxEntries: 1,
@@ -71,27 +77,21 @@ registerRoute(
 	})
 )
 
-// Read API routes: stale-while-revalidate so the last-fetched response
-// renders immediately — offline or not — while a fresh copy is fetched in
-// the background for next time. Auth-sensitive routes are intentionally
-// excluded below.
-const STALE_WHILE_REVALIDATE_APIS = [
-	"/api/notifications",
-	"/api/chat/conversations",
-]
+// Read API routes: network-first, falling back to the last-fetched response
+// only when offline.
+const NETWORK_FIRST_APIS = ["/api/notifications", "/api/chat/conversations"]
 
 registerRoute(
 	({ url }) =>
 		url.origin === self.location.origin &&
-		STALE_WHILE_REVALIDATE_APIS.some((prefix) =>
-			url.pathname.startsWith(prefix)
-		),
-	new StaleWhileRevalidate({
-		cacheName: "api-stale",
+		NETWORK_FIRST_APIS.some((prefix) => url.pathname.startsWith(prefix)),
+	new NetworkFirst({
+		cacheName: "api-network-first",
+		networkTimeoutSeconds: NETWORK_TIMEOUT_SECONDS,
 		plugins: [
 			new ExpirationPlugin({
 				maxEntries: 60,
-				maxAgeSeconds: 5 * 60, // 5 minutes max staleness
+				maxAgeSeconds: 5 * 60, // 5 minutes max staleness of the offline fallback
 			}),
 		],
 	})
@@ -104,7 +104,10 @@ registerRoute(
 	({ url }) =>
 		url.origin === self.location.origin &&
 		NETWORK_ONLY_APIS.some((prefix) => url.pathname.startsWith(prefix)),
-	new NetworkFirst({ cacheName: "api-auth" })
+	new NetworkFirst({
+		cacheName: "api-auth",
+		networkTimeoutSeconds: NETWORK_TIMEOUT_SECONDS,
+	})
 )
 
 // ─── Background sync for mutation requests ────────────────────────────────────
@@ -298,6 +301,7 @@ registerRoute(
 	({ request }) => request.mode === "navigate",
 	new NetworkFirst({
 		cacheName: "navigation",
+		networkTimeoutSeconds: NETWORK_TIMEOUT_SECONDS,
 		plugins: [new ExpirationPlugin({ maxEntries: 1, maxAgeSeconds: 60 })],
 	})
 )
