@@ -40,6 +40,14 @@ export type ChatConversationLastMessage = {
 	createdAt: string
 }
 
+export type ChatLocationShare = {
+	senderId: string
+	latitude: number | null
+	longitude: number | null
+	accuracyMeters: number | null
+	lastUpdatedAt: string | null
+}
+
 export type ChatConversation = {
 	id: string
 	otherUser: ChatUser | null
@@ -47,4 +55,6 @@ export type ChatConversation = {
 	unreadCount: number
 	lastMessageAt: string | null
 	isArchived: boolean
+	otherUserLocationShare: ChatLocationShare | null
+	myLocationShare: ChatLocationShare | null
 }

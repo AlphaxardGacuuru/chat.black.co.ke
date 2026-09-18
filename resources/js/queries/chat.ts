@@ -186,6 +186,53 @@ export function useForwardMessage() {
 	})
 }
 
+export function useStartLocationShare(conversationId: string) {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: () =>
+			Axios.post(`api/chat/conversations/${conversationId}/location`),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["chat", "conversations"] })
+			queryClient.invalidateQueries({
+				queryKey: ["chat", "conversation", conversationId],
+			})
+		},
+	})
+}
+
+export function useStopLocationShare(conversationId: string) {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: () =>
+			Axios.delete(`api/chat/conversations/${conversationId}/location`),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["chat", "conversations"] })
+			queryClient.invalidateQueries({
+				queryKey: ["chat", "conversation", conversationId],
+			})
+		},
+	})
+}
+
+// Fires every ~10s while a share is live — deliberately no invalidation here.
+// The map dialog gets live position via the presence-channel whisper, not by
+// refetching the whole conversation on every tick.
+export function useUpdateLocationShare(conversationId: string) {
+	return useMutation({
+		mutationFn: (position: {
+			latitude: number
+			longitude: number
+			accuracyMeters?: number
+		}) =>
+			Axios.patch(
+				`api/chat/conversations/${conversationId}/location`,
+				position
+			),
+	})
+}
+
 export type ChatUserSearchResult = {
 	id: string
 	name: string

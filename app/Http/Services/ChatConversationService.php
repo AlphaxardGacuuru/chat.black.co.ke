@@ -22,7 +22,7 @@ class ChatConversationService extends Service
             ->notDeletedBy($this->id)
             ->with([
                 'participants',
-                'messages' => fn($query) => $query->latest()->limit(1)
+                'messages' => fn($query) => $query->latest()->limit(1),
             ])
             ->orderByDesc('last_message_at')
             ->get();

@@ -29,7 +29,16 @@ class ChatConversation extends Model
     {
         return $this->belongsToMany(User::class, 'chat_conversation_participants', 'conversation_id', 'user_id')
             ->using(ChatConversationParticipant::class)
-            ->withPivot('last_read_at', 'archived_at', 'deleted_at')
+            ->withPivot(
+                'last_read_at',
+                'archived_at',
+                'deleted_at',
+                'is_sharing_location',
+                'location_latitude',
+                'location_longitude',
+                'location_accuracy_meters',
+                'location_updated_at',
+            )
             ->withTimestamps();
     }
 

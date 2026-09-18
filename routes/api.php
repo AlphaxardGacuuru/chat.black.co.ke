@@ -5,6 +5,7 @@ use App\Http\Controllers\FilePondController;
 use App\Http\Controllers\IntegrationController;
 use App\Http\Controllers\Chat\ChatAttachmentController;
 use App\Http\Controllers\Chat\ChatConversationController;
+use App\Http\Controllers\Chat\ChatLocationShareController;
 use App\Http\Controllers\Chat\ChatMessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnboardingController;
@@ -57,6 +58,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('chat/messages/{id}', [ChatMessageController::class, 'destroy']);
     Route::post('chat/messages/{id}/star', [ChatMessageController::class, 'star']);
     Route::post('chat/messages/{id}/forward', [ChatMessageController::class, 'forward']);
+
+    Route::post('chat/conversations/{id}/location', [ChatLocationShareController::class, 'start']);
+    Route::patch('chat/conversations/{id}/location', [ChatLocationShareController::class, 'update'])
+        ->middleware('throttle:12,1');
+    Route::delete('chat/conversations/{id}/location', [ChatLocationShareController::class, 'stop']);
 
     Route::get('attachments/{id}/download', [ChatAttachmentController::class, 'download'])
         ->name('attachments.download');

@@ -49,6 +49,35 @@ export function useConversationChannel(
 		"presence"
 	)
 
+	// LocationShareStarted/Stopped only need to refresh otherUserLocationShare
+	// / myLocationShare on the conversation — LocationShareMapDialog listens
+	// for LocationShareStopped separately to close itself while open.
+	useEcho(
+		channelName,
+		"LocationShareStarted",
+		() => {
+			queryClient.invalidateQueries({ queryKey: ["chat", "conversations"] })
+			queryClient.invalidateQueries({
+				queryKey: ["chat", "conversation", conversationId],
+			})
+		},
+		[conversationId],
+		"presence"
+	)
+
+	useEcho(
+		channelName,
+		"LocationShareStopped",
+		() => {
+			queryClient.invalidateQueries({ queryKey: ["chat", "conversations"] })
+			queryClient.invalidateQueries({
+				queryKey: ["chat", "conversation", conversationId],
+			})
+		},
+		[conversationId],
+		"presence"
+	)
+
 	useEffect(() => {
 		const presenceChannel = channel()
 

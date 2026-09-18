@@ -7,11 +7,13 @@ import type { KeyboardEvent } from "react"
 import { FilePond, registerPlugin } from "react-filepond"
 import { useQueryClient } from "@tanstack/react-query"
 import FilePondController from "@/actions/App/Http/Controllers/FilePondController"
+import ShareLocationMenu from "@/components/chat/ShareLocationMenu"
 import { Button } from "@/components/ui/button"
+import type { useConversationChannel } from "@/hooks/use-conversation-channel"
 import Axios from "@/lib/axios"
 import toast from "@/lib/toast"
 import { useSendMessage } from "@/queries/chat"
-import type { ChatMessage } from "@/types/chat"
+import type { ChatLocationShare, ChatMessage } from "@/types/chat"
 
 import "filepond/dist/filepond.min.css"
 
@@ -23,11 +25,21 @@ type Props = {
 	replyingTo?: ChatMessage | null
 	onCancelReply?: () => void
 	initialBody?: string
+	myLocationShare: ChatLocationShare | null
+	channel: ReturnType<typeof useConversationChannel>["channel"]
 }
 
 const MessageComposer = forwardRef<HTMLDivElement, Props>(
 	function MessageComposer(
-		{ conversationId, onTyping, replyingTo, onCancelReply, initialBody },
+		{
+			conversationId,
+			onTyping,
+			replyingTo,
+			onCancelReply,
+			initialBody,
+			myLocationShare,
+			channel,
+		},
 		ref
 	) {
 		const [body, setBody] = useState(initialBody ?? "")
@@ -111,83 +123,87 @@ const MessageComposer = forwardRef<HTMLDivElement, Props>(
 					)}
 
 					{showAttachments && (
-						<FilePond
-							ref={pondRef}
-							name="filepond-chat-attachments"
-							allowMultiple
-							maxFileSize="25MB"
-							credits={false}
-							labelIdle='<span class="filepond--label-action">Attach files</span> or drag and drop'
-							server={{
-								process: (
-									fieldName,
-									file,
-									_metadata,
-									load,
-									error,
-									progress,
-									abort
-								) => {
-									const controller = new AbortController()
-									const formData = new FormData()
-									formData.append(fieldName, file, file.name)
+						<div className="mt-2 mx-2">
+							<FilePond
+								ref={pondRef}
+								name="filepond-chat-attachments"
+								allowMultiple
+								maxFileSize="25MB"
+								credits={false}
+								labelIdle='<span class="filepond--label-action">Attach files</span> or drag and drop'
+								server={{
+									process: (
+										fieldName,
+										file,
+										_metadata,
+										load,
+										error,
+										progress,
+										abort
+									) => {
+										const controller = new AbortController()
+										const formData = new FormData()
+										formData.append(fieldName, file, file.name)
 
-									Axios.post(
-										FilePondController.storeChatAttachment.url(),
-										formData,
-										{
-											signal: controller.signal,
-											onUploadProgress: (event) => {
-												if (event.total) {
-													progress(true, event.loaded, event.total)
+										Axios.post(
+											FilePondController.storeChatAttachment.url(),
+											formData,
+											{
+												signal: controller.signal,
+												onUploadProgress: (event) => {
+													if (event.total) {
+														progress(true, event.loaded, event.total)
+													}
+												},
+											}
+										)
+											.then((response) => load(String(response.data)))
+											.catch((requestError) => {
+												if (isCancel(requestError)) {
+													return
 												}
+												error("Upload failed")
+											})
+
+										return {
+											abort: () => {
+												controller.abort()
+												abort()
 											},
 										}
-									)
-										.then((response) => load(String(response.data)))
-										.catch((requestError) => {
-											if (isCancel(requestError)) {
-												return
-											}
-											error("Upload failed")
-										})
-
-									return {
-										abort: () => {
-											controller.abort()
-											abort()
-										},
-									}
-								},
-								revert: (uniqueFileId, load, error) => {
-									Axios.delete(
-										FilePondController.destroyChatAttachment.url(uniqueFileId)
-									)
-										.then(() => load())
-										.catch(() => error("Could not remove attachment"))
-								},
-							}}
-							onprocessfilestart={() => setPendingUploads((count) => count + 1)}
-							onprocessfile={(err, file: FilePondFile) => {
-								setPendingUploads((count) => Math.max(0, count - 1))
-								if (!err) {
-									setAttachmentIds((prev) => ({
-										...prev,
-										[file.id]: Number(file.serverId),
-									}))
+									},
+									revert: (uniqueFileId, load, error) => {
+										Axios.delete(
+											FilePondController.destroyChatAttachment.url(uniqueFileId)
+										)
+											.then(() => load())
+											.catch(() => error("Could not remove attachment"))
+									},
+								}}
+								onprocessfilestart={() =>
+									setPendingUploads((count) => count + 1)
 								}
-							}}
-							onprocessfileabort={() =>
-								setPendingUploads((count) => Math.max(0, count - 1))
-							}
-							onremovefile={(_err, file: FilePondFile) => {
-								setAttachmentIds((prev) => {
-									const next = { ...prev }
-									delete next[file.id]
-									return next
-								})
-							}}
-						/>
+								onprocessfile={(err, file: FilePondFile) => {
+									setPendingUploads((count) => Math.max(0, count - 1))
+									if (!err) {
+										setAttachmentIds((prev) => ({
+											...prev,
+											[file.id]: Number(file.serverId),
+										}))
+									}
+								}}
+								onprocessfileabort={() =>
+									setPendingUploads((count) => Math.max(0, count - 1))
+								}
+								onremovefile={(_err, file: FilePondFile) => {
+									setAttachmentIds((prev) => {
+										const next = { ...prev }
+										delete next[file.id]
+										return next
+									})
+								}}
+							/>
+						</div>
 					)}
 
 					<div className="flex items-center gap-1">
@@ -197,10 +213,16 @@ const MessageComposer = forwardRef<HTMLDivElement, Props>(
 							size="icon"
 							aria-label="Attach files"
 							title="Attach files"
-							className="rounded-full p-6"
+							className="rounded-full p-0"
 							onClick={() => setShowAttachments((value) => !value)}>
 							<Paperclip className="size-6" />
 						</Button>
+
+						<ShareLocationMenu
+							conversationId={conversationId}
+							myLocationShare={myLocationShare}
+							channel={channel}
+						/>
 
 						<textarea
 							value={body}

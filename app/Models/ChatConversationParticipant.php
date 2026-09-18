@@ -10,6 +10,10 @@ class ChatConversationParticipant extends Pivot
 
     protected $casts = [
         'last_read_at' => 'datetime',
+        'is_sharing_location' => 'boolean',
+        'location_latitude' => 'float',
+        'location_longitude' => 'float',
+        'location_accuracy_meters' => 'float',
     ];
 
     // last_read_at is cast, so Eloquent re-parses and reformats it on every

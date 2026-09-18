@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, MapPin } from "lucide-react"
 import ForwardMessageDialog from "@/components/chat/ForwardMessageDialog"
+import LocationShareMapDialog from "@/components/chat/LocationShareMapDialog"
 import MessageBubble from "@/components/chat/MessageBubble"
 import MessageComposer from "@/components/chat/MessageComposer"
 import TypingIndicator from "@/components/chat/TypingIndicator"
@@ -73,6 +74,7 @@ export default function ConversationView({
 	const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null)
 	const [forwardingMessage, setForwardingMessage] =
 		useState<ChatMessage | null>(null)
+	const [locationDialogOpen, setLocationDialogOpen] = useState(false)
 	const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(
 		new Set()
 	)
@@ -264,6 +266,16 @@ export default function ConversationView({
 						{otherUser?.verified && (
 							<VerifiedBadge className="size-3.5 shrink-0" />
 						)}
+						{conversation.otherUserLocationShare && (
+							<button
+								type="button"
+								aria-label="View live location"
+								title="View live location"
+								className="shrink-0"
+								onClick={() => setLocationDialogOpen(true)}>
+								<MapPin className="size-3.5 animate-pulse text-primary" />
+							</button>
+						)}
 						{isOnline && (
 							<span
 								className="size-2 shrink-0 rounded-full bg-primary"
@@ -313,12 +325,23 @@ export default function ConversationView({
 				replyingTo={replyingTo}
 				onCancelReply={() => setReplyingTo(null)}
 				initialBody={initialBody}
+				myLocationShare={conversation.myLocationShare}
+				channel={channel}
 			/>
 
 			<ForwardMessageDialog
 				message={forwardingMessage}
 				excludeConversationId={conversationId}
 				onOpenChange={(open) => !open && setForwardingMessage(null)}
+			/>
+
+			<LocationShareMapDialog
+				open={locationDialogOpen && !!conversation.otherUserLocationShare}
+				onOpenChange={setLocationDialogOpen}
+				conversationId={conversationId}
+				share={conversation.otherUserLocationShare}
+				senderName={otherUser?.name ?? "They"}
+				channel={channel}
 			/>
 		</div>
 	)
