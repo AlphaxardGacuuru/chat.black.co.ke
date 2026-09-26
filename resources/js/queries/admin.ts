@@ -24,8 +24,11 @@ export type AdminUser = {
 	id: string
 	name: string
 	email: string
+	phone: string | null
+	gender: "male" | "female" | "other" | null
 	avatar: string | null
 	verified: boolean
+	createdAt: string
 }
 
 type AdminUsersResponse = {
@@ -33,12 +36,12 @@ type AdminUsersResponse = {
 	meta: { current_page: number; last_page: number; total: number }
 }
 
-export function useAdminUsers(search: string, page = 1) {
+export function useAdminUsers(search: string, page = 1, perPage = 20) {
 	return useQuery({
-		queryKey: ["admin", "users", search, page],
+		queryKey: ["admin", "users", search, page, perPage],
 		queryFn: () =>
 			Axios.get<AdminUsersResponse>("api/admin/users", {
-				params: { name: search || undefined, page, per_page: 20 },
+				params: { name: search || undefined, page, per_page: perPage },
 			}).then((res) => res.data),
 	})
 }
