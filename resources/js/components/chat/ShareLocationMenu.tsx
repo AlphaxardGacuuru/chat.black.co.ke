@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
 import LocationSharePermissionModal from "@/components/location-share-permission-modal"
 import type { useConversationChannel } from "@/hooks/use-conversation-channel"
 import { useLocationSharing } from "@/hooks/use-location-sharing"
@@ -97,16 +98,22 @@ export default function ShareLocationMenu({
 				type="button"
 				variant="ghost"
 				size="icon"
-				aria-label={myLocationShare ? "Stop sharing location" : "Share location"}
+				aria-label={
+					myLocationShare ? "Stop sharing location" : "Share location"
+				}
 				title={myLocationShare ? "Stop sharing location" : "Share location"}
 				className="rounded-full"
 				disabled={startShare.isPending || stopShare.isPending}
 				onClick={handleToggle}>
-				<MapPin
-					className={
-						myLocationShare ? "size-6 animate-pulse text-primary" : "size-6"
-					}
-				/>
+				{startShare.isPending || stopShare.isPending ? (
+					<Spinner className="size-6" />
+				) : (
+					<MapPin
+						className={
+							myLocationShare ? "size-6 animate-pulse text-primary" : "size-6"
+						}
+					/>
+				)}
 			</Button>
 
 			<LocationSharePermissionModal

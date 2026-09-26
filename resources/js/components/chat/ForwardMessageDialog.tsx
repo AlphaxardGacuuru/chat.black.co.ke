@@ -7,6 +7,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Spinner } from "@/components/ui/spinner"
 import VerifiedBadge from "@/components/verified-badge"
 import { cn } from "@/lib/utils"
 import toast from "@/lib/toast"
@@ -84,34 +85,43 @@ export default function ForwardMessageDialog({
 						</p>
 					)}
 
-					{results.map((conversation) => (
-						<button
-							key={conversation.id}
-							type="button"
-							disabled={forwardMessage.isPending}
-							onClick={() => handleSelect(conversation.id)}
-							className={cn(
-								"flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-muted disabled:opacity-50"
-							)}>
-							<Avatar className="size-9 shrink-0">
-								<AvatarImage
-									src={conversation.otherUser?.avatar ?? undefined}
-									alt={conversation.otherUser?.name}
-								/>
-								<AvatarFallback>
-									{initials(conversation.otherUser?.name)}
-								</AvatarFallback>
-							</Avatar>
-							<span className="flex min-w-0 items-center gap-1 text-sm font-medium">
-								<span className="min-w-0 truncate">
-									{conversation.otherUser?.name ?? "Unknown"}
+					{results.map((conversation) => {
+						const isForwardingHere =
+							forwardMessage.isPending &&
+							forwardMessage.variables?.conversationId === conversation.id
+
+						return (
+							<button
+								key={conversation.id}
+								type="button"
+								disabled={forwardMessage.isPending}
+								onClick={() => handleSelect(conversation.id)}
+								className={cn(
+									"flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-muted disabled:opacity-50"
+								)}>
+								<Avatar className="size-9 shrink-0">
+									<AvatarImage
+										src={conversation.otherUser?.avatar ?? undefined}
+										alt={conversation.otherUser?.name}
+									/>
+									<AvatarFallback>
+										{initials(conversation.otherUser?.name)}
+									</AvatarFallback>
+								</Avatar>
+								<span className="flex min-w-0 flex-1 items-center gap-1 text-sm font-medium">
+									<span className="min-w-0 truncate">
+										{conversation.otherUser?.name ?? "Unknown"}
+									</span>
+									{conversation.otherUser?.verified && (
+										<VerifiedBadge className="size-3.5 shrink-0" />
+									)}
 								</span>
-								{conversation.otherUser?.verified && (
-									<VerifiedBadge className="size-3.5 shrink-0" />
+								{isForwardingHere && (
+									<Spinner className="size-4 shrink-0 text-muted-foreground" />
 								)}
-							</span>
-						</button>
-					))}
+							</button>
+						)
+					})}
 				</div>
 			</DialogContent>
 		</Dialog>

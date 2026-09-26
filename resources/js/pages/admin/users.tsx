@@ -5,11 +5,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DataTable } from "@/components/ui/data-table"
 import { Input } from "@/components/ui/input"
+import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import VerifiedBadge from "@/components/verified-badge"
 import { Head } from "@/lib/spa"
 import toast from "@/lib/toast"
-import { type AdminUser, useAdminUsers, useToggleUserVerified } from "@/queries/admin"
+import {
+	type AdminUser,
+	useAdminUsers,
+	useToggleUserVerified,
+} from "@/queries/admin"
 
 function initials(name?: string | null): string {
 	return (name?.trim() || "?").slice(0, 2).toUpperCase()
@@ -87,22 +92,31 @@ export default function AdminUsers() {
 			header: "Verified",
 			enableSorting: false,
 			meta: { className: "text-right" },
-			cell: ({ row }) => (
-				<div className="flex justify-end">
-					<Switch
-						checked={row.original.verified}
-						disabled={toggleVerified.isPending}
-						onCheckedChange={(checked) =>
-							handleToggle(row.original.id, checked)
-						}
-						aria-label={
-							row.original.verified
-								? `Remove verified badge from ${row.original.name}`
-								: `Verify ${row.original.name}`
-						}
-					/>
-				</div>
-			),
+			cell: ({ row }) => {
+				const isTogglingThisUser =
+					toggleVerified.isPending &&
+					toggleVerified.variables?.userId === row.original.id
+
+				return (
+					<div className="flex justify-end items-center gap-2">
+						{isTogglingThisUser && (
+							<Spinner className="size-4 text-muted-foreground" />
+						)}
+						<Switch
+							checked={row.original.verified}
+							disabled={toggleVerified.isPending}
+							onCheckedChange={(checked) =>
+								handleToggle(row.original.id, checked)
+							}
+							aria-label={
+								row.original.verified
+									? `Remove verified badge from ${row.original.name}`
+									: `Verify ${row.original.name}`
+							}
+						/>
+					</div>
+				)
+			},
 		},
 	]
 

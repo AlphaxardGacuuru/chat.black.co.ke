@@ -1,3 +1,4 @@
+import { LoaderCircle } from "lucide-react"
 import { useRef, useState } from "react"
 import ProfileController from "@/actions/App/Http/Controllers/Settings/ProfileController"
 import Heading from "@/components/heading"
@@ -138,6 +139,9 @@ export default function DeleteUser() {
 									<button
 										type="submit"
 										data-test="confirm-delete-user-button">
+										{processing && (
+											<LoaderCircle className="h-4 w-4 animate-spin" />
+										)}
 										Delete account
 									</button>
 								</Button>

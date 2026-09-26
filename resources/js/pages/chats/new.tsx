@@ -62,35 +62,44 @@ export default function ChatNew() {
 					)}
 
 					{!isLoading &&
-						users?.map((user) => (
-							<button
-								key={user.id}
-								type="button"
-								disabled={startConversation.isPending}
-								onClick={() => handlePick(user.id)}
-								className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-muted disabled:opacity-50">
-								<Avatar className="size-9 shrink-0">
-									<AvatarImage
-										src={user.avatar ?? undefined}
-										alt={user.name}
-									/>
-									<AvatarFallback>
-										{user.name.slice(0, 2).toUpperCase()}
-									</AvatarFallback>
-								</Avatar>
-								<div className="grid min-w-0 flex-1 text-left leading-tight">
-									<span className="flex min-w-0 items-center gap-1 font-medium">
-										<span className="min-w-0 truncate">{user.name}</span>
-										{user.verified && (
-											<VerifiedBadge className="size-3.5 shrink-0" />
-										)}
-									</span>
-									<span className="truncate text-xs text-muted-foreground">
-										{user.email}
-									</span>
-								</div>
-							</button>
-						))}
+						users?.map((user) => {
+							const isPickingThisUser =
+								startConversation.isPending &&
+								startConversation.variables === user.id
+
+							return (
+								<button
+									key={user.id}
+									type="button"
+									disabled={startConversation.isPending}
+									onClick={() => handlePick(user.id)}
+									className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-muted disabled:opacity-50">
+									<Avatar className="size-9 shrink-0">
+										<AvatarImage
+											src={user.avatar ?? undefined}
+											alt={user.name}
+										/>
+										<AvatarFallback>
+											{user.name.slice(0, 2).toUpperCase()}
+										</AvatarFallback>
+									</Avatar>
+									<div className="grid min-w-0 flex-1 text-left leading-tight">
+										<span className="flex min-w-0 items-center gap-1 font-medium">
+											<span className="min-w-0 truncate">{user.name}</span>
+											{user.verified && (
+												<VerifiedBadge className="size-3.5 shrink-0" />
+											)}
+										</span>
+										<span className="truncate text-xs text-muted-foreground">
+											{user.email}
+										</span>
+									</div>
+									{isPickingThisUser && (
+										<Spinner className="size-4 shrink-0 text-muted-foreground" />
+									)}
+								</button>
+							)
+						})}
 				</div>
 			</div>
 		</>

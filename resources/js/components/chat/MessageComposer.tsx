@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import FilePondController from "@/actions/App/Http/Controllers/FilePondController"
 import ShareLocationMenu from "@/components/chat/ShareLocationMenu"
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
 import type { useConversationChannel } from "@/hooks/use-conversation-channel"
 import Axios from "@/lib/axios"
 import toast from "@/lib/toast"
@@ -244,7 +245,11 @@ const MessageComposer = forwardRef<HTMLDivElement, Props>(
 							className="rounded-full p-6"
 							disabled={!canSend || sendMessage.isPending}
 							onClick={handleSend}>
-							<Send className="size-6 rotate-315" />
+							{sendMessage.isPending ? (
+								<Spinner className="size-6" />
+							) : (
+								<Send className="size-6 rotate-315" />
+							)}
 						</Button>
 					</div>
 				</div>
