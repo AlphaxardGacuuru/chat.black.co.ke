@@ -13,3 +13,7 @@ This app runs under [Laravel Sail](https://laravel.com/docs/sail) (Docker). Alwa
 If `./vendor/bin/sail` or `docker-compose.yml` is missing from a checkout, it hasn't been published yet — run `php artisan sail:install` (via a one-off local PHP, or `composer install` first) to generate it before using the commands above.
 
 `.env`'s `DB_HOST=mysql` etc. are Docker Compose service hostnames — they only resolve inside the Sail network, not on the host.
+
+# Naming conventions
+
+Events and listeners must carry the matching suffix: an event class ends in `Event` (e.g. `UserCreatedEvent`) and the listener that handles it ends in `Listener` (e.g. `UserCreatedListener`).
