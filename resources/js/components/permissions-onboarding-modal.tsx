@@ -13,6 +13,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { useApp } from "@/contexts/AppContext"
 import { usePwaInstallStepResolved } from "@/hooks/use-onboarding-sequence"
+import { usePwaInstall } from "@/hooks/use-pwa-install"
 import { usePushNotifications } from "@/hooks/use-push-notifications"
 import Axios from "@/lib/axios"
 import toast from "@/lib/toast"
@@ -24,6 +25,7 @@ export default function PermissionsOnboardingModal() {
 	const queryClient = useQueryClient()
 	const { isSupported, permission, subscribe } = usePushNotifications()
 	const pwaInstallStepResolved = usePwaInstallStepResolved()
+	const { isInstalled } = usePwaInstall()
 
 	const [open, setOpen] = useState(false)
 	const [processing, setProcessing] = useState(false)
@@ -47,7 +49,10 @@ export default function PermissionsOnboardingModal() {
 			!auth ||
 			onboardedAt ||
 			hasPromptedForNotificationsThisVisit ||
-			!pwaInstallStepResolved
+			!pwaInstallStepResolved ||
+			// Only ask once the app is actually installed and running
+			// standalone — never prompt for this in a regular browser tab.
+			!isInstalled
 		) {
 			return
 		}
@@ -66,7 +71,14 @@ export default function PermissionsOnboardingModal() {
 
 		hasPromptedForNotificationsThisVisit = true
 		setOpen(true)
-	}, [auth, onboardedAt, isSupported, permission, pwaInstallStepResolved])
+	}, [
+		auth,
+		onboardedAt,
+		isSupported,
+		permission,
+		pwaInstallStepResolved,
+		isInstalled,
+	])
 
 	async function handleEnable() {
 		setProcessing(true)
@@ -85,7 +97,8 @@ export default function PermissionsOnboardingModal() {
 
 			if (permission === "denied") {
 				toast.error("Notifications blocked", {
-					description: "Allow notifications for this site in your browser settings.",
+					description:
+						"Allow notifications for this site in your browser settings.",
 				})
 			}
 		} finally {
