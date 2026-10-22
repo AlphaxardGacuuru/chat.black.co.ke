@@ -21,6 +21,7 @@ import {
 	Sparkles,
 	Zap,
 } from "lucide-react"
+import { ScrollToTopButton } from "@/components/scroll-to-top-button"
 
 type WelcomeProps = {
 	canRegister?: boolean
@@ -38,8 +39,16 @@ const heroStatusLegend: StatusLegendEntry[] = [
 ]
 
 const fullStatusLegend: StatusLegendEntry[] = [
-	{ isRead: false, label: "Sent", description: "Delivered the instant you hit send." },
-	{ isRead: true, label: "Read", description: "Turns blue the moment they open it." },
+	{
+		isRead: false,
+		label: "Sent",
+		description: "Delivered the instant you hit send.",
+	},
+	{
+		isRead: true,
+		label: "Read",
+		description: "Turns blue the moment they open it.",
+	},
 ]
 
 const featureHighlights = [
@@ -151,6 +160,7 @@ const Welcome: FC<WelcomeProps> = () => {
 
 	return (
 		<div className="relative isolate min-h-screen overflow-hidden bg-background text-foreground">
+			<ScrollToTopButton />
 			{!isCoarsePointer && (
 				<div
 					aria-hidden="true"
@@ -244,8 +254,7 @@ const Welcome: FC<WelcomeProps> = () => {
 							</h1>
 							<p className="max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
 								Real-time chat built around one status icon that tells you
-								exactly where every message stands, from your device to
-								theirs.
+								exactly where every message stands, from your device to theirs.
 							</p>
 							<p className="max-w-xl text-base leading-7 text-muted-foreground/90">
 								Every message arrives instantly and turns blue the moment
@@ -412,9 +421,7 @@ const Welcome: FC<WelcomeProps> = () => {
 							<div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
 								<Paperclip className="size-5" />
 							</div>
-							<h3 className="mt-5 text-lg font-semibold">
-								Share on the go
-							</h3>
+							<h3 className="mt-5 text-lg font-semibold">Share on the go</h3>
 							<p className="mt-3 text-sm leading-6 text-muted-foreground">
 								Drop in photos and files right inside the conversation, no
 								separate upload flow.
@@ -512,8 +519,8 @@ const Welcome: FC<WelcomeProps> = () => {
 						</CardHeader>
 						<CardContent>
 							<p className="text-sm leading-6 text-muted-foreground">
-								Messages travel over a live connection the moment you hit
-								send — the other person sees it appear without refreshing.
+								Messages travel over a live connection the moment you hit send —
+								the other person sees it appear without refreshing.
 							</p>
 						</CardContent>
 					</Card>
@@ -534,8 +541,8 @@ const Welcome: FC<WelcomeProps> = () => {
 						</CardHeader>
 						<CardContent>
 							<p className="text-sm leading-6 text-muted-foreground">
-								The tick turns blue the instant they open the conversation —
-								no more wondering if they've seen it.
+								The tick turns blue the instant they open the conversation — no
+								more wondering if they've seen it.
 							</p>
 						</CardContent>
 					</Card>
@@ -556,8 +563,8 @@ const Welcome: FC<WelcomeProps> = () => {
 						</CardHeader>
 						<CardContent>
 							<p className="text-sm leading-6 text-muted-foreground">
-								See when someone's typing, and check their last-seen status
-								when they're not around.
+								See when someone's typing, and check their last-seen status when
+								they're not around.
 							</p>
 						</CardContent>
 					</Card>
