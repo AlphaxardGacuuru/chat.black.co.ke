@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { useConversation } from "@/queries/chat"
 import type { BreadcrumbItem as BreadcrumbItemType } from "@/types"
 import ChatConnectionStatus from "@/components/chat/ChatConnectionStatus"
+import { NotificationsBell } from "@/components/notifications-bell"
 
 export function AppSidebarHeader({
 	breadcrumbs = [],
@@ -59,6 +60,7 @@ export function AppSidebarHeader({
 			</div>
 
 			<ChatConnectionStatus />
+			<NotificationsBell />
 
 			<button
 				type="button"
