@@ -24,12 +24,14 @@ import {
 } from "@/components/ui/sidebar"
 import { useCurrentUrl } from "@/hooks/use-current-url"
 
+// Telescope, Horizon and Pulse are Laravel-rendered dashboards, opened in a
+// new tab so the app stays open behind them.
 const ADMIN_ITEMS = [
 	{ title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
 	{ title: "Users", href: "/admin/users", icon: Users },
-	{ title: "Telescope", href: "/telescope", icon: Telescope },
-	{ title: "Horizon", href: "/horizon", icon: Activity },
-	{ title: "Pulse", href: "/pulse", icon: Gauge },
+	{ title: "Telescope", href: "/telescope", icon: Telescope, newTab: true },
+	{ title: "Horizon", href: "/horizon", icon: Activity, newTab: true },
+	{ title: "Pulse", href: "/pulse", icon: Gauge, newTab: true },
 ]
 
 export function AdminNav() {
@@ -57,7 +59,10 @@ export function AdminNav() {
 										<SidebarMenuSubButton
 											asChild
 											isActive={isCurrentOrParentUrl(item.href)}>
-											<Link href={item.href}>
+											<Link
+												href={item.href}
+												target={item.newTab ? "_blank" : undefined}
+												rel={item.newTab ? "noopener" : undefined}>
 												<item.icon className="size-4" />
 												<span>{item.title}</span>
 											</Link>
